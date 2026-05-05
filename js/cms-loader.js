@@ -1,23 +1,130 @@
 /**
  * cms-loader.js — Pucon Hygge Stays
- * Carga datos dinámicos desde la API (tablas) y actualiza el DOM del front-end.
+ * Carga datos dinámicos desde Supabase REST API y actualiza el DOM del front-end.
  * Conecta el panel Admin con la página pública.
  */
 
 'use strict';
 
-/* ─── Helper API (Supabase) ─── */
+/* ═══════════════════════════════════════════
+   CONFIGURACIÓN SUPABASE
+   ═══════════════════════════════════════════
+   Las credenciales se leen, en orden de prioridad:
+     1. window.SUPABASE_CONFIG  (definido por <script> previo en el HTML)
+     2. <meta name="supabase-url"> y <meta name="supabase-anon-key">
+     3. Fallback hardcodeado (NO recomendado para producción)
+
+   Para inyectar las credenciales sin tocar este archivo, agregá en index.html
+   ANTES de <script src="js/cms-loader.js" defer>:
+
+     <script>
+       window.SUPABASE_CONFIG = {
+         url: 'https://vpoutrwyrtcwsvwhumwz.supabase.co/rest/v1/',
+         anonKey: 'eyJhbGciOi...'
+       };
+     </script>
+═══════════════════════════════════════════ */
+const SUPABASE_CONFIG = (() => {
+  // 1) Variable global (recomendado)
+  if (typeof window !== 'undefined' && window.SUPABASE_CONFIG?.url && window.SUPABASE_CONFIG?.anonKey) {
+    return {
+      url: window.SUPABASE_CONFIG.url.replace(/\/?$/, '/'), // asegurar slash final
+      anonKey: window.SUPABASE_CONFIG.anonKey
+    };
+  }
+  // 2) Meta tags
+  const metaUrl = document.querySelector('meta[name="supabase-url"]')?.content;
+  const metaKey = document.querySelector('meta[name="supabase-anon-key"]')?.content;
+  if (metaUrl && metaKey) {
+    return { url: metaUrl.replace(/\/?$/, '/'), anonKey: metaKey };
+  }
+  // 3) Fallback hardcodeado
+  return {
+    url: 'https://vpoutrwyrtcwsvwhumwz.supabase.co/rest/v1/',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwb3V0cnd5cnRjd3N2d2h1bXd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTg1NDUsImV4cCI6MjA5MjUzNDU0NX0.fO0eDhVcOntA0muHFGNG8K3kwgahRVyBTMv_p7rLvDY'
+  };
+})();
+
+/* ─── Helper API (Supabase REST) ───
+   Mantiene la firma original cmsApi(table, params) para no romper el resto del archivo.
+   Traduce el formato antiguo ('&sort=orden', '&limit=100') al formato de Supabase
+   (?select=*&order=orden.asc&limit=100). */
 async function cmsApi(table, params = '') {
-  if (typeof SUPABASE_CONFIGURED !== 'undefined' && !SUPABASE_CONFIGURED) return [];
   try {
-    const res = await fetch(supaUrl(table, `${params}&limit=100`), {
-      headers: supaHeaders()
+    const url = buildSupabaseUrl(table, params);
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'apikey': SUPABASE_CONFIG.anonKey,
+        'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
     });
-    if (!res.ok) return [];
-    return await res.json();
-  } catch {
+
+    if (!res.ok) {
+      // Loguear pero no romper el sitio: degradación elegante
+      console.warn(`[CMS] ${table} → HTTP ${res.status} ${res.statusText}`);
+      return [];
+    }
+
+    const json = await res.json();
+    // Supabase devuelve un array directo; el formato antiguo devolvía { data: [...] }
+    if (Array.isArray(json)) return json;
+    if (json && Array.isArray(json.data)) return json.data;
+    return [];
+  } catch (err) {
+    console.warn(`[CMS] Error consultando "${table}":`, err.message || err);
     return [];
   }
+}
+
+/* Construye la URL de Supabase aplicando defaults + traduciendo el formato legacy. */
+function buildSupabaseUrl(table, legacyParams = '') {
+  const u = new URL(`${SUPABASE_CONFIG.url}${encodeURIComponent(table)}`);
+  const sp = u.searchParams;
+
+  // SELECT por defecto (Supabase requiere select explícito o devuelve todo)
+  sp.set('select', '*');
+
+  // Parsear params legacy del estilo "&sort=orden&limit=100&filter=col:eq:val"
+  // y traducirlos a la sintaxis de Supabase (PostgREST).
+  if (legacyParams) {
+    // Normalizar: aceptar tanto "&a=b&c=d" como "a=b&c=d"
+    const cleaned = legacyParams.replace(/^[?&]/, '');
+    cleaned.split('&').filter(Boolean).forEach(pair => {
+      const [rawKey, ...rest] = pair.split('=');
+      const key = rawKey.trim();
+      const value = rest.join('=').trim();
+      if (!key) return;
+
+      switch (key) {
+        case 'sort':
+        case 'order':
+          // 'orden' → 'orden.asc'  |  '-orden' → 'orden.desc'
+          if (value.startsWith('-')) {
+            sp.set('order', `${value.slice(1)}.desc`);
+          } else {
+            sp.set('order', `${value}.asc`);
+          }
+          break;
+        case 'limit':
+          sp.set('limit', value);
+          break;
+        case 'offset':
+          sp.set('offset', value);
+          break;
+        default:
+          // Pasar tal cual (útil para filtros tipo 'activo=eq.true')
+          sp.set(key, value);
+      }
+    });
+  }
+
+  // Default de límite si nadie lo seteó (matchea el comportamiento original "limit=100")
+  if (!sp.has('limit')) sp.set('limit', '100');
+
+  return u.toString();
 }
 
 /* ─── Helper: set text safely ─── */
@@ -65,9 +172,6 @@ async function loadCMSTextos() {
   setText('cms-nosotros-p2', data.nosotros_p2);
   setText('cms-nosotros-badge', data.nosotros_badge);
   setText('cms-nosotros-cta', data.nosotros_cta);
-  // Imágenes de nosotros desde Storage
-  if (data.nosotros_imagen_main) setAttr('nosotros-img-main', 'src', data.nosotros_imagen_main);
-  if (data.nosotros_imagen_sec)  setAttr('nosotros-img-sec',  'src', data.nosotros_imagen_sec);
 
   // Departamentos
   setText('cms-deptos-eyebrow', data.deptos_eyebrow);
@@ -136,7 +240,7 @@ async function loadCMSTextos() {
    2. HERO CARRUSEL — reemplaza imagen estática
 ═══════════════════════════════════════════ */
 async function loadHeroCarousel() {
-  const imgs = await cmsApi('hero_carousel', '&order=orden.asc');
+  const imgs = await cmsApi('hero_carousel', '&sort=orden');
   const active = imgs.filter(i => i.activo !== false);
   if (!active.length) return; // mantener imagen estática por defecto
 
@@ -222,44 +326,37 @@ async function loadHeroCarousel() {
 
   heroBg.querySelector('.hc-prev').addEventListener('click', () => goTo(current - 1));
   heroBg.querySelector('.hc-next').addEventListener('click', () => goTo(current + 1));
-  dots.forEach(dot => dot.addEventListener('click', () => goTo(parseInt(dot.dataset.idx))));
-
-  // Touch
-  let touchX = 0;
-  heroBg.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
-  heroBg.addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - touchX;
-    if (Math.abs(dx) > 50) goTo(current + (dx < 0 ? 1 : -1));
-  });
-
+  dots.forEach((dot, i) => dot.addEventListener('click', () => goTo(i)));
   resetTimer();
 }
 
 /* ═══════════════════════════════════════════
-   3. DEPARTAMENTOS — carrusel dinámico de fotos
+   3. FOTOS DE DEPARTAMENTOS — reemplaza sliders
 ═══════════════════════════════════════════ */
 async function loadDepartamentosFotos() {
-  const [deptos, todasFotos] = await Promise.all([
-    cmsApi('departamentos', '&order=orden.asc'),
-    cmsApi('depto_fotos', '&order=orden.asc')
+  const [deptos, fotos] = await Promise.all([
+    cmsApi('departamentos', '&sort=orden'),
+    cmsApi('depto_fotos', '&sort=orden')
   ]);
+  if (!deptos.length) return;
 
-  // Mapear: depto_id → fotos ordenadas activas
+  // Agrupar fotos por depto_id
   const fotosMap = {};
-  todasFotos.filter(f => f.activo !== false).forEach(f => {
+  fotos.filter(f => f.activo !== false).forEach(f => {
     if (!fotosMap[f.depto_id]) fotosMap[f.depto_id] = [];
     fotosMap[f.depto_id].push(f);
   });
 
-  // Ordenar deptos
-  const sorted = deptos.sort((a, b) => (a.orden || 99) - (b.orden || 99));
-  if (!sorted.length) return;
-
-  // Actualizar visibilidad y sliders
-  const slugMap = { 'volcan': 'slider-201', 'lago': 'slider-207', 'bosque': 'slider-bosque' };
+  // Mapear nombre → slider DOM
+  const sorted = [...deptos].sort((a, b) => (a.orden || 0) - (b.orden || 0));
+  const slugMap = {
+    'volcan': 'slider-201',
+    'lago': 'slider-207',
+    'bosque': 'slider-bosque'
+  };
   const cardMap = {
-    'volcan': document.querySelector('#slider-201')?.closest('article.apt-card'),
-    'lago': document.querySelector('#slider-207')?.closest('article.apt-card'),
+    'volcan': document.getElementById('card-volcan'),
+    'lago': document.getElementById('card-lago'),
     'bosque': document.getElementById('card-bosque')
   };
 
@@ -320,7 +417,7 @@ function aptSlugLocal(nombre) {
    4. VIVE PUCÓN — actividades dinámicas
 ═══════════════════════════════════════════ */
 async function loadActividades() {
-  const acts = await cmsApi('actividades_pucon', '&order=orden.asc');
+  const acts = await cmsApi('actividades_pucon', '&sort=orden');
   const active = acts.filter(a => a.activo !== false);
   if (!active.length) return;
 
@@ -373,7 +470,7 @@ async function loadActividades() {
    5. ÁREAS COMUNES — galería dinámica
 ═══════════════════════════════════════════ */
 async function loadAreasComunesFotos() {
-  const fotos = await cmsApi('areas_comunes_fotos', '&order=orden.asc');
+  const fotos = await cmsApi('areas_comunes_fotos', '&sort=orden');
   const active = fotos.filter(f => f.activo !== false);
   if (!active.length) return;
 
@@ -405,7 +502,7 @@ async function loadAreasComunesFotos() {
    6. PLAYA PRIVADA — galería dinámica
 ═══════════════════════════════════════════ */
 async function loadPlayaFotos() {
-  const fotos = await cmsApi('playa_fotos', '&order=orden.asc');
+  const fotos = await cmsApi('playa_fotos', '&sort=orden');
   const active = fotos.filter(f => f.activo !== false);
   if (!active.length) return;
 
@@ -433,33 +530,10 @@ async function loadPlayaFotos() {
 }
 
 /* ═══════════════════════════════════════════
-   7. GALERÍA DINÁMICA — fotos desde galeria_fotos
-═══════════════════════════════════════════ */
-async function loadGaleriaDinamica() {
-  const fotos = await cmsApi('galeria_fotos', '&order=orden.asc,created_at.desc');
-  const active = fotos.filter(f => f.activo !== false);
-  if (!active.length) return; // mantener fallback estático
-
-  const masonry = document.getElementById('galeria-dinamica');
-  if (!masonry) return;
-
-  // Clases de layout para variedad visual (alterna tall/wide en las posiciones 0, 3, 5)
-  const layoutClasses = ['gal-tall','','','gal-wide','','gal-tall','','','gal-wide',''];
-
-  masonry.innerHTML = active.map((f, i) => `
-    <div class="gal-item ${layoutClasses[i % layoutClasses.length]}">
-      <img src="${f.imagen_url}" alt="${f.titulo || 'Pucon Hygge Stays'}" loading="${i < 4 ? 'eager' : 'lazy'}"
-        onerror="this.style.display='none'" />
-      <div class="gal-overlay"><span>${f.titulo || ''}</span></div>
-    </div>
-  `).join('');
-}
-
-/* ═══════════════════════════════════════════
-   8. VISIBILIDAD DE DEPARTAMENTOS (activo/oculto)
+   7. VISIBILIDAD DE DEPARTAMENTOS (activo/oculto)
 ═══════════════════════════════════════════ */
 async function loadDepartamentosVisibility() {
-  const deptos = await cmsApi('departamentos', '&order=orden.asc');
+  const deptos = await cmsApi('departamentos', '&sort=orden');
   if (!deptos.length) return;
 
   const slugMap = {
@@ -486,7 +560,6 @@ async function initCMSLoader() {
     loadActividades(),
     loadAreasComunesFotos(),
     loadPlayaFotos(),
-    loadGaleriaDinamica(),
     loadDepartamentosVisibility()
   ]);
 
@@ -501,4 +574,4 @@ if (document.readyState === 'loading') {
   initCMSLoader();
 }
 
-console.log('✦ CMS Loader — Pucon Hygge Stays initialized');
+console.log('✦ CMS Loader — Pucon Hygge Stays initialized (Supabase)');
