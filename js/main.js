@@ -9,6 +9,122 @@ const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
 /* ═══════════════════════════════════════════════
+   SUPABASE REST API — config + helpers
+   ═══════════════════════════════════════════════
+   Lee credenciales en este orden:
+     1. window.SUPABASE_CONFIG (recomendado, definido en el HTML)
+     2. <meta name="supabase-url"> y <meta name="supabase-anon-key">
+     3. Fallback hardcodeado
+═══════════════════════════════════════════════ */
+const SUPABASE = (() => {
+  let url, anonKey;
+
+  if (typeof window !== 'undefined' && window.SUPABASE_CONFIG?.url && window.SUPABASE_CONFIG?.anonKey) {
+    url = window.SUPABASE_CONFIG.url;
+    anonKey = window.SUPABASE_CONFIG.anonKey;
+  } else {
+    const metaUrl = document.querySelector('meta[name="supabase-url"]')?.content;
+    const metaKey = document.querySelector('meta[name="supabase-anon-key"]')?.content;
+    if (metaUrl && metaKey) {
+      url = metaUrl;
+      anonKey = metaKey;
+    } else {
+      url = 'https://vpoutrwyrtcwsvwhumwz.supabase.co/rest/v1/';
+      anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwb3V0cnd5cnRjd3N2d2h1bXd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTg1NDUsImV4cCI6MjA5MjUzNDU0NX0.fO0eDhVcOntA0muHFGNG8K3kwgahRVyBTMv_p7rLvDY';
+    }
+  }
+
+  // Asegurar slash final en la URL base
+  url = url.replace(/\/?$/, '/');
+
+  // Headers base reusables
+  const baseHeaders = {
+    'apikey': anonKey,
+    'Authorization': `Bearer ${anonKey}`,
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  };
+
+  /**
+   * INSERT en una tabla (POST).
+   * @param {string} table - nombre de la tabla
+   * @param {object} payload - registro a insertar
+   * @returns {Promise<Response>}
+   */
+  async function insert(table, payload) {
+    return fetch(`${url}${encodeURIComponent(table)}`, {
+      method: 'POST',
+      headers: {
+        ...baseHeaders,
+        // 'minimal' = no devuelve el row insertado; más rápido y evita lecturas no permitidas por RLS
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
+  }
+
+  /**
+   * SELECT con paginación opcional (GET).
+   * @param {string} table - nombre de la tabla
+   * @param {object} opts - { page, limit, order, filters }
+   *   - page (1-indexed, default 1)
+   *   - limit (default 100)
+   *   - order: string ('created_at' asc, '-created_at' desc) o array
+   *   - filters: { columna: 'eq.valor' } pasado tal cual a PostgREST
+   * @returns {Promise<{data: any[], total: number, ok: boolean}>}
+   */
+  async function select(table, opts = {}) {
+    const { page = 1, limit = 100, order, filters = {} } = opts;
+    const u = new URL(`${url}${encodeURIComponent(table)}`);
+    u.searchParams.set('select', '*');
+
+    // Orden: 'created_at' → 'created_at.asc' | '-created_at' → 'created_at.desc'
+    if (order) {
+      const orders = Array.isArray(order) ? order : [order];
+      const formatted = orders.map(o =>
+        o.startsWith('-') ? `${o.slice(1)}.desc` : `${o}.asc`
+      ).join(',');
+      u.searchParams.set('order', formatted);
+    }
+
+    // Filtros adicionales (ej: { publicado: 'eq.true' })
+    Object.entries(filters).forEach(([k, v]) => u.searchParams.set(k, v));
+
+    // Paginación con offset (Supabase no usa "page")
+    const offset = (page - 1) * limit;
+    u.searchParams.set('limit', String(limit));
+    u.searchParams.set('offset', String(offset));
+
+    const res = await fetch(u.toString(), {
+      method: 'GET',
+      headers: {
+        ...baseHeaders,
+        // Pedir el conteo total en el header Content-Range
+        'Prefer': 'count=exact'
+      }
+    });
+
+    if (!res.ok) {
+      return { data: [], total: 0, ok: false };
+    }
+
+    const data = await res.json();
+
+    // Content-Range: "0-9/142"  → total = 142
+    let total = Array.isArray(data) ? data.length : 0;
+    const range = res.headers.get('Content-Range');
+    if (range) {
+      const parsed = parseInt(range.split('/')[1], 10);
+      if (!Number.isNaN(parsed)) total = parsed;
+    }
+
+    return { data: Array.isArray(data) ? data : [], total, ok: true };
+  }
+
+  return { url, anonKey, insert, select };
+})();
+
+/* ═══════════════════════════════════════════════
    1. NAVIGATION
    ═══════════════════════════════════════════════ */
 (function initNav() {
@@ -351,13 +467,14 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     };
 
     try {
-      await fetch(`${SUPABASE_URL}/rest/v1/reservas`, {
-        method: 'POST',
-        headers: supaHeaders({ 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }),
-        body: JSON.stringify(data),
-      });
+      // Save to Supabase
+      const res = await SUPABASE.insert('reservas', data);
+      if (!res.ok) {
+        console.warn('Reserva save failed:', res.status, await res.text().catch(() => ''));
+      }
     } catch (err) {
-      console.warn('Table save error:', err);
+      // Silently continue even if table fails — el flujo de WhatsApp sigue funcionando
+      console.warn('Reserva save error:', err);
     }
 
     // Show success
@@ -414,13 +531,12 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     };
 
     try {
-      await fetch(`${SUPABASE_URL}/rest/v1/mensajes`, {
-        method: 'POST',
-        headers: supaHeaders({ 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }),
-        body: JSON.stringify(data),
-      });
+      const res = await SUPABASE.insert('mensajes', data);
+      if (!res.ok) {
+        console.warn('Mensaje save failed:', res.status, await res.text().catch(() => ''));
+      }
     } catch (err) {
-      console.warn('Table save error:', err);
+      console.warn('Mensaje save error:', err);
     }
 
     setTimeout(() => {
@@ -647,17 +763,16 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
   async function loadNews(pg = 1) {
     try {
-      const offset = (pg - 1) * PAGE_SIZE;
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/noticias?select=*&order=created_at.desc&limit=${PAGE_SIZE}&offset=${offset}`,
-        { headers: supaHeaders({ 'Prefer': 'count=exact' }) }
-      );
-      if (!res.ok) throw new Error('API error');
-      const allPosts = await res.json();
-      const range = res.headers.get('content-range');
-      totalPosts = range ? parseInt(range.split('/')[1]) || 0 : allPosts.length;
+      // Más reciente primero ('-created_at' = orden DESC)
+      const { data, total, ok } = await SUPABASE.select('noticias', {
+        page: pg,
+        limit: PAGE_SIZE,
+        order: '-created_at'
+      });
+      if (!ok) throw new Error('API error');
+      totalPosts = total || 0;
 
-      const posts = allPosts.filter(p => p.publicado !== false && p.publicado !== 'false');
+      const posts = data.filter(p => p.publicado !== false && p.publicado !== 'false');
 
       if (pg === 1) {
         loadingEl.style.display = 'none';
