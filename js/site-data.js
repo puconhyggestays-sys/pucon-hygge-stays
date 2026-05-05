@@ -7,15 +7,57 @@
 
 const SiteData = (() => {
 
-  /* ── helpers (Supabase) ── */
+  /* ── Config Supabase (lee window.SUPABASE_CONFIG, <meta>, o fallback) ── */
+  const _SB = (() => {
+    let url, key;
+    if (typeof window !== 'undefined' && window.SUPABASE_CONFIG?.url && window.SUPABASE_CONFIG?.anonKey) {
+      url = window.SUPABASE_CONFIG.url;
+      key = window.SUPABASE_CONFIG.anonKey;
+    } else {
+      const mu = document.querySelector('meta[name="supabase-url"]')?.content;
+      const mk = document.querySelector('meta[name="supabase-anon-key"]')?.content;
+      if (mu && mk) { url = mu; key = mk; }
+      else {
+        url = 'https://vpoutrwyrtcwsvwhumwz.supabase.co/rest/v1/';
+        key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwb3V0cnd5cnRjd3N2d2h1bXd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTg1NDUsImV4cCI6MjA5MjUzNDU0NX0.fO0eDhVcOntA0muHFGNG8K3kwgahRVyBTMv_p7rLvDY';
+      }
+    }
+    return { url: url.replace(/\/?$/, '/'), key };
+  })();
+
+  /* ── helpers ── */
   async function apiFetch(table, params = '') {
-    if (typeof SUPABASE_CONFIGURED !== 'undefined' && !SUPABASE_CONFIGURED) return [];
     try {
-      const res = await fetch(supaUrl(table, `${params}&limit=200`), {
-        headers: supaHeaders()
+      // Construir URL Supabase: select=* obligatorio + traducir params legacy
+      const u = new URL(`${_SB.url}${encodeURIComponent(table)}`);
+      u.searchParams.set('select', '*');
+      u.searchParams.set('limit', '200');
+      // Traducir '&sort=campo' o '&sort=-campo' a 'order=campo.asc/desc'
+      if (params) {
+        const cleaned = params.replace(/^[?&]/, '');
+        cleaned.split('&').filter(Boolean).forEach(pair => {
+          const [k, ...rest] = pair.split('=');
+          const v = rest.join('=');
+          if (!k) return;
+          if (k === 'sort' || k === 'order') {
+            u.searchParams.set('order', v.startsWith('-') ? `${v.slice(1)}.desc` : `${v}.asc`);
+          } else {
+            u.searchParams.set(k, v);
+          }
+        });
+      }
+      const res = await fetch(u.toString(), {
+        headers: {
+          'apikey': _SB.key,
+          'Authorization': `Bearer ${_SB.key}`,
+          'Accept': 'application/json'
+        }
       });
       if (!res.ok) return [];
-      return await res.json();
+      const json = await res.json();
+      // Supabase devuelve array directo; mantener compatibilidad con formato {data:[]}
+      if (Array.isArray(json)) return json;
+      return json.data || [];
     } catch (e) {
       console.warn(`[SiteData] No se pudo cargar ${table}:`, e.message);
       return [];
