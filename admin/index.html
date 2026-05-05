@@ -11,7 +11,6 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
-  <script src="../js/config.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -30,17 +29,6 @@
     button { font-family: var(--font); cursor: pointer; border: none; outline: none; }
     input, select, textarea { font-family: var(--font); font-size: 0.9rem; }
     img { max-width: 100%; }
-
-    /* ═══ UPLOAD COMPONENT ═══ */
-    .upload-field { display:flex; flex-direction:column; gap:0.5rem; }
-    .upload-preview-wrap { position:relative; border-radius:8px; overflow:hidden; max-height:180px; background:var(--cream-d); }
-    .upload-preview-img { width:100%; max-height:180px; object-fit:cover; display:block; }
-    .upload-remove-btn { position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.55); color:#fff; border:none; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:0.75rem; transition:background 0.2s; }
-    .upload-remove-btn:hover { background:rgba(192,57,43,0.9); }
-    .upload-actions-row { display:flex; align-items:center; gap:0; flex-wrap:wrap; gap:0.4rem; }
-    .upload-progress-wrap { display:flex; align-items:center; gap:0.6rem; background:var(--cream-d); border-radius:6px; padding:0.4rem 0.75rem; }
-    .upload-progress-bar { height:6px; background:var(--forest); border-radius:3px; transition:width 0.4s ease; width:0; flex:1; }
-    #prog-label-${inputId} { font-size:0.78rem; color:var(--mid); white-space:nowrap; }
 
     /* ═══ LOGIN ═══ */
     #loginScreen { position: fixed; inset: 0; background: var(--earth); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.4s ease; }
@@ -650,16 +638,14 @@
       </div>
 
       <!-- ═══ GALERÍA ═══ -->
-      <!-- ═══ GALERÍA ═══ -->
       <div class="view" id="view-galeria">
         <div class="page-header">
-          <div class="page-header-left"><h1>Galería de Imágenes</h1><p>Fotos que aparecen en la sección Galería del sitio</p></div>
-          <div class="page-header-actions"><button class="btn btn-primary" onclick="openNewGaleriaModal()"><i class="fa-solid fa-plus"></i> Subir foto</button></div>
+          <div class="page-header-left"><h1>Galería de Imágenes</h1><p>Fotos disponibles en el proyecto</p></div>
         </div>
-        <div class="card">
-          <div class="card-header"><h2><i class="fa-solid fa-images"></i> Todas las fotos</h2></div>
-          <div class="gallery-admin-grid" id="galeria-grid" style="padding:1rem;"></div>
-        </div>
+        <div class="alert alert-info"><i class="fa-solid fa-circle-info"></i> &nbsp;Las imágenes se sirven desde <code>images/</code>. Sube archivos directamente al proyecto en las carpetas correspondientes.</div>
+        <div class="card"><div class="card-header"><h2><i class="fa-solid fa-door-open"></i> Depto Volcán #201</h2></div><div class="gallery-admin-grid" id="gallery201"></div></div>
+        <div class="card"><div class="card-header"><h2><i class="fa-solid fa-water"></i> Depto Lago #207</h2></div><div class="gallery-admin-grid" id="gallery207"></div></div>
+        <div class="card"><div class="card-header"><h2><i class="fa-solid fa-building-columns"></i> Áreas Comunes</h2></div><div class="gallery-admin-grid" id="galleryComunes"></div></div>
       </div>
 
       <!-- ═══ NOTICIAS ═══ -->
@@ -768,27 +754,16 @@
       <div id="deptoFotosList"></div>
       <div style="background:var(--cream-d);border-radius:8px;padding:1rem;margin-top:1rem;">
         <p class="form-label" style="margin-bottom:0.5rem;"><i class="fa-solid fa-plus"></i> Agregar nueva foto</p>
-        <div style="display:flex;flex-direction:column;gap:0.5rem;">
-          <div class="upload-field">
-            <div class="upload-preview-wrap" id="prev-df-new-url" style="display:none;">
-              <img src="" alt="Preview" class="upload-preview-img" />
-              <button type="button" class="upload-remove-btn" onclick="clearUploadField('df-new-url','prev-df-new-url')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="upload-actions-row">
-              <input type="file" accept="image/*" id="file-df-new-url" style="display:none" onchange="handleFileUpload(this,'df-new-url','prev-df-new-url','departamentos')">
-              <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('file-df-new-url').click()"><i class="fa-solid fa-upload"></i> Subir foto</button>
-              <span style="font-size:0.75rem;color:var(--mid);">o</span>
-              <input type="text" class="form-control" id="df-new-url" placeholder="Pegar URL de imagen..." oninput="previewFromUrlField(this.value,'prev-df-new-url')" style="flex:1;" />
-            </div>
-            <div class="upload-progress-wrap" id="prog-df-new-url" style="display:none;"><div class="upload-progress-bar" id="progbar-df-new-url"></div><span id="prog-label-df-new-url">Subiendo...</span></div>
+        <div style="display:flex;gap:0.5rem;align-items:flex-end;flex-wrap:wrap;">
+          <div class="form-group" style="flex:1;min-width:200px;margin:0;">
+            <label class="form-label">Ruta de imagen</label>
+            <input type="text" class="form-control" id="df-new-url" placeholder="images/201/01-living-sala.jpg" />
           </div>
-          <div style="display:flex;gap:0.5rem;align-items:flex-end;flex-wrap:wrap;">
-            <div class="form-group" style="flex:1;min-width:150px;margin:0;">
-              <label class="form-label">Descripción</label>
-              <input type="text" class="form-control" id="df-new-titulo" placeholder="Living sala" />
-            </div>
-            <button class="btn btn-primary" onclick="addDeptoFoto()" style="white-space:nowrap;"><i class="fa-solid fa-plus"></i> Agregar</button>
+          <div class="form-group" style="flex:1;min-width:150px;margin:0;">
+            <label class="form-label">Descripción</label>
+            <input type="text" class="form-control" id="df-new-titulo" placeholder="Living sala" />
           </div>
+          <button class="btn btn-primary" onclick="addDeptoFoto()" style="white-space:nowrap;"><i class="fa-solid fa-plus"></i> Agregar</button>
         </div>
       </div>
     </div>
@@ -804,20 +779,12 @@
       <input type="hidden" id="hero-id" />
       <div class="form-grid cols-1">
         <div class="form-group">
-          <label class="form-label">Imagen *</label>
-          <div class="upload-field">
-            <div class="upload-preview-wrap" id="prev-hero-url" style="display:none;">
-              <img src="" alt="Preview" class="upload-preview-img" />
-              <button type="button" class="upload-remove-btn" onclick="clearUploadField('hero-url','prev-hero-url')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="upload-actions-row">
-              <input type="file" accept="image/*" id="file-hero-url" style="display:none" onchange="handleFileUpload(this,'hero-url','prev-hero-url','hero')">
-              <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('file-hero-url').click()"><i class="fa-solid fa-upload"></i> Subir foto</button>
-              <span style="font-size:0.75rem;color:var(--mid);">o</span>
-              <input type="text" class="form-control" id="hero-url" placeholder="Pegar URL de imagen..." oninput="previewFromUrlField(this.value,'prev-hero-url')" style="flex:1;" />
-            </div>
-            <div class="upload-progress-wrap" id="prog-hero-url" style="display:none;"><div class="upload-progress-bar" id="progbar-hero-url"></div><span id="prog-label-hero-url">Subiendo...</span></div>
-          </div>
+          <label class="form-label">Ruta de imagen *</label>
+          <input type="text" class="form-control" id="hero-url" placeholder="images/207/08-terraza-vista-volcan.jpg" oninput="previewHeroImg()" />
+          <span class="form-hint">Ruta relativa desde la raíz del proyecto.</span>
+        </div>
+        <div style="text-align:center;">
+          <img id="heroModalPreview" src="" alt="Preview" style="max-height:140px;border-radius:8px;display:none;margin:0 auto;" />
         </div>
         <div class="form-group">
           <label class="form-label">Título (opcional)</label>
@@ -853,20 +820,11 @@
       <div class="form-grid cols-1">
         <div class="form-group"><label class="form-label">Título *</label><input type="text" class="form-control" id="act-titulo" placeholder="Lago Villarrica" /></div>
         <div class="form-group">
-          <label class="form-label">Imagen</label>
-          <div class="upload-field">
-            <div class="upload-preview-wrap" id="prev-act-imagen" style="display:none;">
-              <img src="" alt="Preview" class="upload-preview-img" />
-              <button type="button" class="upload-remove-btn" onclick="clearUploadField('act-imagen','prev-act-imagen')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="upload-actions-row">
-              <input type="file" accept="image/*" id="file-act-imagen" style="display:none" onchange="handleFileUpload(this,'act-imagen','prev-act-imagen','actividades')">
-              <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('file-act-imagen').click()"><i class="fa-solid fa-upload"></i> Subir foto</button>
-              <span style="font-size:0.75rem;color:var(--mid);">o</span>
-              <input type="text" class="form-control" id="act-imagen" placeholder="Pegar URL de imagen..." oninput="previewFromUrlField(this.value,'prev-act-imagen')" style="flex:1;" />
-            </div>
-            <div class="upload-progress-wrap" id="prog-act-imagen" style="display:none;"><div class="upload-progress-bar" id="progbar-act-imagen"></div><span id="prog-label-act-imagen">Subiendo...</span></div>
-          </div>
+          <label class="form-label">Ruta de imagen</label>
+          <input type="text" class="form-control" id="act-imagen" placeholder="images/207/07-terraza.jpg" oninput="previewActImg()" />
+        </div>
+        <div style="text-align:center;">
+          <img id="actImgPreview" src="" alt="" style="max-height:120px;border-radius:8px;display:none;margin:0 auto;" />
         </div>
         <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-control" id="act-desc" rows="4" placeholder="Descripción de la actividad..."></textarea></div>
         <div class="form-group"><label class="form-label">Orden</label><input type="number" class="form-control" id="act-orden" value="1" min="1" /></div>
@@ -891,21 +849,10 @@
       <input type="hidden" id="area-id" />
       <div class="form-grid cols-1">
         <div class="form-group">
-          <label class="form-label">Imagen *</label>
-          <div class="upload-field">
-            <div class="upload-preview-wrap" id="prev-area-url" style="display:none;">
-              <img src="" alt="Preview" class="upload-preview-img" />
-              <button type="button" class="upload-remove-btn" onclick="clearUploadField('area-url','prev-area-url')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="upload-actions-row">
-              <input type="file" accept="image/*" id="file-area-url" style="display:none" onchange="handleFileUpload(this,'area-url','prev-area-url','areas-comunes')">
-              <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('file-area-url').click()"><i class="fa-solid fa-upload"></i> Subir foto</button>
-              <span style="font-size:0.75rem;color:var(--mid);">o</span>
-              <input type="text" class="form-control" id="area-url" placeholder="Pegar URL de imagen..." oninput="previewFromUrlField(this.value,'prev-area-url')" style="flex:1;" />
-            </div>
-            <div class="upload-progress-wrap" id="prog-area-url" style="display:none;"><div class="upload-progress-bar" id="progbar-area-url"></div><span id="prog-label-area-url">Subiendo...</span></div>
-          </div>
+          <label class="form-label">Ruta de imagen *</label>
+          <input type="text" class="form-control" id="area-url" placeholder="images/comunes/juegos-infantiles.jpg" oninput="previewAreaImg()" />
         </div>
+        <div style="text-align:center;"><img id="areaImgPreview" src="" alt="" style="max-height:120px;border-radius:8px;display:none;margin:0 auto;" /></div>
         <div class="form-group"><label class="form-label">Título / Descripción</label><input type="text" class="form-control" id="area-titulo" placeholder="Juegos Infantiles" /></div>
         <div class="form-group"><label class="form-label">Orden</label><input type="number" class="form-control" id="area-orden" value="1" min="1" /></div>
         <div class="toggle-wrap">
@@ -929,21 +876,10 @@
       <input type="hidden" id="playa-id" />
       <div class="form-grid cols-1">
         <div class="form-group">
-          <label class="form-label">Imagen *</label>
-          <div class="upload-field">
-            <div class="upload-preview-wrap" id="prev-playa-url" style="display:none;">
-              <img src="" alt="Preview" class="upload-preview-img" />
-              <button type="button" class="upload-remove-btn" onclick="clearUploadField('playa-url','prev-playa-url')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="upload-actions-row">
-              <input type="file" accept="image/*" id="file-playa-url" style="display:none" onchange="handleFileUpload(this,'playa-url','prev-playa-url','playa')">
-              <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('file-playa-url').click()"><i class="fa-solid fa-upload"></i> Subir foto</button>
-              <span style="font-size:0.75rem;color:var(--mid);">o</span>
-              <input type="text" class="form-control" id="playa-url" placeholder="Pegar URL de imagen..." oninput="previewFromUrlField(this.value,'prev-playa-url')" style="flex:1;" />
-            </div>
-            <div class="upload-progress-wrap" id="prog-playa-url" style="display:none;"><div class="upload-progress-bar" id="progbar-playa-url"></div><span id="prog-label-playa-url">Subiendo...</span></div>
-          </div>
+          <label class="form-label">Ruta de imagen *</label>
+          <input type="text" class="form-control" id="playa-url" placeholder="images/207/07-terraza.jpg" oninput="previewPlayaImg()" />
         </div>
+        <div style="text-align:center;"><img id="playaImgPreview" src="" alt="" style="max-height:120px;border-radius:8px;display:none;margin:0 auto;" /></div>
         <div class="form-group"><label class="form-label">Título</label><input type="text" class="form-control" id="playa-titulo" placeholder="Acceso Privado al Lago" /></div>
         <div class="form-group"><label class="form-label">Descripción breve</label><input type="text" class="form-control" id="playa-desc" placeholder="Bajada exclusiva para huéspedes" /></div>
         <div class="form-group"><label class="form-label">Orden</label><input type="number" class="form-control" id="playa-orden" value="1" min="1" /></div>
@@ -974,22 +910,7 @@
         <div class="form-group"><label class="form-label">Fecha</label><input type="date" class="form-control" id="n-fecha" /></div>
         <div class="form-group span-2"><label class="form-label">Resumen</label><textarea class="form-control" id="n-resumen" rows="2"></textarea></div>
         <div class="form-group span-2"><label class="form-label">Contenido completo (HTML)</label><textarea class="form-control" id="n-contenido" rows="6"></textarea></div>
-        <div class="form-group span-2">
-          <label class="form-label">Imagen portada</label>
-          <div class="upload-field">
-            <div class="upload-preview-wrap" id="prev-n-imagen" style="display:none;">
-              <img src="" alt="Preview" class="upload-preview-img" />
-              <button type="button" class="upload-remove-btn" onclick="clearUploadField('n-imagen','prev-n-imagen')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="upload-actions-row">
-              <input type="file" accept="image/*" id="file-n-imagen" style="display:none" onchange="handleFileUpload(this,'n-imagen','prev-n-imagen','noticias')">
-              <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('file-n-imagen').click()"><i class="fa-solid fa-upload"></i> Subir foto</button>
-              <span style="font-size:0.75rem;color:var(--mid);">o</span>
-              <input type="text" class="form-control" id="n-imagen" placeholder="Pegar URL de imagen..." oninput="previewFromUrlField(this.value,'prev-n-imagen')" style="flex:1;" />
-            </div>
-            <div class="upload-progress-wrap" id="prog-n-imagen" style="display:none;"><div class="upload-progress-bar" id="progbar-n-imagen"></div><span id="prog-label-n-imagen">Subiendo...</span></div>
-          </div>
-        </div>
+        <div class="form-group span-2"><label class="form-label">URL imagen portada</label><input type="text" class="form-control" id="n-imagen" placeholder="images/207/08-terraza-vista-volcan.jpg" /></div>
         <div class="form-group"><label class="form-label">Autor</label><input type="text" class="form-control" id="n-autor" value="Pucon Hygge Stays" /></div>
         <div class="form-group" style="justify-content:flex-end;">
           <div class="toggle-wrap" style="padding-top:1.5rem;">
@@ -1007,53 +928,6 @@
 </div>
 
 <!-- Modal: Confirm -->
-<!-- ═══ MODAL GALERÍA ═══ -->
-<div class="modal-overlay" id="modalGaleria">
-  <div class="modal">
-    <div class="modal-header"><h3 id="modalGaleriaTitle">Subir foto a la galería</h3><button class="modal-close" onclick="closeModal('modalGaleria')"><i class="fa-solid fa-xmark"></i></button></div>
-    <div class="modal-body">
-      <input type="hidden" id="gal-id" />
-      <div class="form-grid cols-1">
-        <div class="form-group">
-          <label class="form-label">Imagen *</label>
-          <div class="upload-field">
-            <div class="upload-preview-wrap" id="prev-gal-url" style="display:none;">
-              <img src="" alt="Preview" class="upload-preview-img" />
-              <button type="button" class="upload-remove-btn" onclick="clearUploadField('gal-url','prev-gal-url')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="upload-actions-row">
-              <input type="file" accept="image/*" id="file-gal-url" style="display:none" onchange="handleFileUpload(this,'gal-url','prev-gal-url','galeria')">
-              <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('file-gal-url').click()"><i class="fa-solid fa-upload"></i> Subir foto</button>
-              <span style="font-size:0.75rem;color:var(--mid);">o</span>
-              <input type="text" class="form-control" id="gal-url" placeholder="Pegar URL de imagen..." oninput="previewFromUrlField(this.value,'prev-gal-url')" style="flex:1;" />
-            </div>
-            <div class="upload-progress-wrap" id="prog-gal-url" style="display:none;"><div class="upload-progress-bar" id="progbar-gal-url"></div><span id="prog-label-gal-url">Subiendo...</span></div>
-          </div>
-        </div>
-        <div class="form-group"><label class="form-label">Descripción / Alt</label><input type="text" class="form-control" id="gal-titulo" placeholder="Vista desde la terraza al volcán" /></div>
-        <div class="form-group"><label class="form-label">Categoría</label>
-          <select class="form-control" id="gal-categoria">
-            <option value="general">General</option>
-            <option value="depto">Departamentos</option>
-            <option value="comunes">Áreas Comunes</option>
-            <option value="playa">Playa / Lago</option>
-            <option value="vista">Vistas y Entorno</option>
-          </select>
-        </div>
-        <div class="form-group"><label class="form-label">Orden</label><input type="number" class="form-control" id="gal-orden" value="1" min="1" /></div>
-        <div class="toggle-wrap">
-          <label class="toggle"><input type="checkbox" id="gal-activo" checked /><span class="toggle-slider"></span></label>
-          <span class="toggle-label">Foto activa (visible en el sitio)</span>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modalGaleria')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveGaleriaFoto()"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
-    </div>
-  </div>
-</div>
-
 <div class="modal-overlay" id="modalConfirm">
   <div class="modal modal-sm">
     <div class="modal-body" style="text-align:center;padding:2rem 1.5rem;">
@@ -1108,21 +982,12 @@ function doLogout() { sessionStorage.removeItem(SESSION_KEY); location.reload();
 function initAdmin() {
   updateTopbarDate();
   loadDashboard();
+  renderGallery();
   renderIcal();
   setInterval(updateTopbarDate, 60000);
 }
 function updateTopbarDate() {
   document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-}
-
-/* ─── IMG SRC HELPER ─── */
-// Resuelve src de imagen: si es URL absoluta (Supabase Storage, http, etc.) la devuelve tal cual;
-// si es ruta relativa (ej. "images/201/..") le antepone "../" (admin está en /admin/).
-function imgSrc(url, fallback = 'images/201/01-living-sala.jpg') {
-  const u = (url || '').trim();
-  if (!u) return '../' + fallback;
-  if (/^(https?:)?\/\//i.test(u) || u.startsWith('data:')) return u;
-  return '../' + u;
 }
 
 /* ─── NAVIGATION ─── */
@@ -1153,7 +1018,6 @@ function navigate(view) {
   if (view === 'areas')          loadAreasFotos();
   if (view === 'playa')          loadPlayaFotos();
   if (view === 'cms')            loadCMS();
-  if (view === 'galeria')        loadGaleria();
 }
 
 /* ─── SIDEBAR ─── */
@@ -1195,101 +1059,99 @@ function showConfirm(title, text, btnLabel, btnClass, cb, iconClass='') {
 }
 function execConfirm() { closeModal('modalConfirm'); if (confirmCallback) confirmCallback(); confirmCallback = null; }
 
-/* ─── UPLOAD COMPONENT ─── */
-function buildUploadField({ inputId, folder, previewId, label = 'Imagen' }) {
-  return `
-    <div class="upload-field" id="uf-${inputId}">
-      <div class="upload-preview-wrap" id="${previewId}" style="display:none;">
-        <img src="" alt="Preview" class="upload-preview-img" />
-        <button type="button" class="upload-remove-btn" onclick="clearUploadField('${inputId}','${previewId}')" title="Quitar imagen">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <div class="upload-actions-row">
-        <input type="file" accept="image/*" id="file-${inputId}" style="display:none"
-          onchange="handleFileUpload(this,'${inputId}','${previewId}','${folder}')">
-        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('file-${inputId}').click()">
-          <i class="fa-solid fa-upload"></i> Subir foto
-        </button>
-        <span style="font-size:0.75rem;color:var(--mid);padding:0 0.4rem;">o</span>
-        <input type="text" class="form-control" id="${inputId}" placeholder="Pegar URL de imagen..."
-          oninput="previewFromUrlField(this.value,'${previewId}')" style="flex:1;" />
-      </div>
-      <div class="upload-progress-wrap" id="prog-${inputId}" style="display:none;">
-        <div class="upload-progress-bar" id="progbar-${inputId}"></div>
-        <span id="prog-label-${inputId}">Subiendo...</span>
-      </div>
-    </div>`;
-}
-
-async function handleFileUpload(fileInput, fieldId, previewId, folder) {
-  const file = fileInput.files[0];
-  if (!file) return;
-  const progWrap = document.getElementById(`prog-${fieldId}`);
-  const progBar = document.getElementById(`progbar-${fieldId}`);
-  const progLabel = document.getElementById(`prog-label-${fieldId}`);
-  if (progWrap) { progWrap.style.display = 'flex'; progBar.style.width = '30%'; progLabel.textContent = 'Subiendo...'; }
-  try {
-    const url = await uploadToStorage(file, folder);
-    document.getElementById(fieldId).value = url;
-    previewFromUrlField(url, previewId);
-    if (progWrap) { progBar.style.width = '100%'; progLabel.textContent = '✅ Subida completa'; setTimeout(() => { progWrap.style.display = 'none'; progBar.style.width = '0'; }, 2000); }
-    showToast('✅ Imagen subida correctamente', 'success');
-  } catch (e) {
-    if (progWrap) { progWrap.style.display = 'none'; }
-    showToast('❌ Error al subir: ' + e.message, 'error', 5000);
+/* ─── API (Supabase REST) ─── */
+const _SUPA = (() => {
+  let url, key;
+  if (typeof window !== 'undefined' && window.SUPABASE_CONFIG?.url && window.SUPABASE_CONFIG?.anonKey) {
+    url = window.SUPABASE_CONFIG.url;
+    key = window.SUPABASE_CONFIG.anonKey;
+  } else {
+    const mu = document.querySelector('meta[name="supabase-url"]')?.content;
+    const mk = document.querySelector('meta[name="supabase-anon-key"]')?.content;
+    if (mu && mk) { url = mu; key = mk; }
+    else {
+      url = 'https://vpoutrwyrtcwsvwhumwz.supabase.co/rest/v1/';
+      key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwb3V0cnd5cnRjd3N2d2h1bXd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTg1NDUsImV4cCI6MjA5MjUzNDU0NX0.fO0eDhVcOntA0muHFGNG8K3kwgahRVyBTMv_p7rLvDY';
+    }
   }
-  fileInput.value = '';
-}
+  url = url.replace(/\/?$/, '/');
+  return {
+    url, key,
+    headers(extra) {
+      return {
+        'apikey': key,
+        'Authorization': `Bearer ${key}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        ...(extra || {})
+      };
+    }
+  };
+})();
 
-function previewFromUrlField(url, previewId) {
-  const wrap = document.getElementById(previewId);
-  if (!wrap) return;
-  if (!url) { wrap.style.display = 'none'; return; }
-  const img = wrap.querySelector('img');
-  if (img) {
-    const u = url.trim();
-    img.src = /^(https?:)?\/\//i.test(u) || u.startsWith('data:') ? u : '../' + u;
-    wrap.style.display = 'block';
-  }
-}
-
-function clearUploadField(fieldId, previewId) {
-  const inp = document.getElementById(fieldId);
-  if (inp) inp.value = '';
-  const wrap = document.getElementById(previewId);
-  if (wrap) { wrap.style.display = 'none'; const img = wrap.querySelector('img'); if (img) img.src = ''; }
-}
-
-/* ─── API (Supabase) ─── */
 async function apiGet(table, params = '') {
   try {
-    const r = await fetch(supaUrl(table, `${params}&limit=200`), { headers: supaHeaders() });
-    if (!r.ok) return { data:[] };
-    const arr = await r.json();
-    return { data: arr };
-  } catch { return { data:[] }; }
+    const u = new URL(`${_SUPA.url}${encodeURIComponent(table)}`);
+    u.searchParams.set('select', '*');
+    u.searchParams.set('limit', '200');
+    // Traducir params legacy ('&sort=orden' -> 'order=orden.asc')
+    if (params) {
+      params.replace(/^[?&]/, '').split('&').filter(Boolean).forEach(pair => {
+        const [k, ...rest] = pair.split('=');
+        const v = rest.join('=');
+        if (!k) return;
+        if (k === 'sort' || k === 'order') {
+          u.searchParams.set('order', v.startsWith('-') ? `${v.slice(1)}.desc` : `${v}.asc`);
+        } else {
+          u.searchParams.set(k, v);
+        }
+      });
+    }
+    const r = await fetch(u.toString(), { headers: _SUPA.headers() });
+    if (!r.ok) return { data: [] };
+    const json = await r.json();
+    // Mantener formato { data: [...] } que el admin ya espera
+    return { data: Array.isArray(json) ? json : (json.data || []) };
+  } catch { return { data: [] }; }
 }
+
 async function apiPost(table, data) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-    method:'POST', headers: supaHeaders({'Content-Type':'application/json','Prefer':'return=representation'}),
-    body:JSON.stringify(data)
+  const r = await fetch(`${_SUPA.url}${encodeURIComponent(table)}`, {
+    method: 'POST',
+    headers: _SUPA.headers({ 'Prefer': 'return=representation' }),
+    body: JSON.stringify(data)
   });
-  const arr = await r.json();
-  return arr[0] || {};
+  if (!r.ok) {
+    console.warn(`[admin] POST ${table} falló:`, r.status, await r.text().catch(()=>''));
+    return null;
+  }
+  // Supabase devuelve un array con el row insertado; el admin espera el row, no un array
+  const json = await r.json();
+  return Array.isArray(json) ? (json[0] || null) : json;
 }
+
 async function apiPatch(table, id, data) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
-    method:'PATCH', headers: supaHeaders({'Content-Type':'application/json','Prefer':'return=representation'}),
-    body:JSON.stringify(data)
+  // Supabase usa ?id=eq.{id}, NO /tables/X/{id}
+  const u = new URL(`${_SUPA.url}${encodeURIComponent(table)}`);
+  u.searchParams.set('id', `eq.${id}`);
+  const r = await fetch(u.toString(), {
+    method: 'PATCH',
+    headers: _SUPA.headers({ 'Prefer': 'return=representation' }),
+    body: JSON.stringify(data)
   });
-  const arr = await r.json();
-  return arr[0] || {};
+  if (!r.ok) {
+    console.warn(`[admin] PATCH ${table}/${id} falló:`, r.status, await r.text().catch(()=>''));
+    return null;
+  }
+  const json = await r.json();
+  return Array.isArray(json) ? (json[0] || null) : json;
 }
+
 async function apiDelete(table, id) {
-  await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
-    method:'DELETE', headers: supaHeaders()
-  });
+  const u = new URL(`${_SUPA.url}${encodeURIComponent(table)}`);
+  u.searchParams.set('id', `eq.${id}`);
+  const r = await fetch(u.toString(), { method: 'DELETE', headers: _SUPA.headers() });
+  if (!r.ok) console.warn(`[admin] DELETE ${table}/${id} falló:`, r.status);
 }
 
 /* ═══════════════════════════════════════════
@@ -1317,7 +1179,7 @@ async function loadDashboard() {
   document.getElementById('dashAptStatus').innerHTML = deptos.slice(0,3).map(d => {
     const nr = reservas.filter(r=>r.apartment&&r.apartment.includes(d.nombre)&&r.checkin>=todayStr()&&r.status!=='rechazada').sort((a,b)=>a.checkin.localeCompare(b.checkin))[0];
     return `<div style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 0;border-bottom:1px solid var(--cream-d);">
-      <img src="${imgSrc(d.imagen_principal)}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;" onerror="this.src='../images/201/01-living-sala.jpg'" />
+      <img src="../${d.imagen_principal||'images/201/01-living-sala.jpg'}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;" onerror="this.src='../images/201/01-living-sala.jpg'" />
       <div style="flex:1;"><div style="font-weight:700;font-size:0.88rem;color:var(--earth);">${d.nombre} ${d.numero||''}</div>
       <div style="font-size:0.75rem;color:var(--mid);">${nr?`Próx: ${formatDate(nr.checkin)}`:'Sin reservas futuras'}</div>
       <div style="font-size:0.78rem;color:var(--bark);font-weight:600;">$${(d.precio_noche||0).toLocaleString('es-CL')}/noche</div></div>
@@ -1487,7 +1349,7 @@ function renderAptGrid() {
   grid.innerHTML=allDeptos.map((d,i)=>`
     <div class="apt-admin-card ${d.activo===false?'inactive':''}">
       <div style="position:relative;">
-        <img class="apt-card-thumb" src="${imgSrc(d.imagen_principal)}" alt="${d.nombre}" onerror="this.src='../images/201/01-living-sala.jpg'" />
+        <img class="apt-card-thumb" src="../${d.imagen_principal||'images/201/01-living-sala.jpg'}" alt="${d.nombre}" onerror="this.src='../images/201/01-living-sala.jpg'" />
         <div style="position:absolute;top:8px;left:8px;background:var(--earth);color:#fff;font-size:0.7rem;font-weight:700;padding:0.2rem 0.55rem;border-radius:20px;">Pos. ${i+1}</div>
         <div style="position:absolute;top:8px;right:8px;">
           <span class="apt-status-dot ${d.activo===false?'inactive':''}" title="${d.activo===false?'Inactivo':'Activo'}" style="width:12px;height:12px;display:block;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></span>
@@ -1565,7 +1427,7 @@ async function openDeptoFotos(deptoId,slug) {
   openModal('modalDeptoFotos');
 }
 async function refreshDeptoFotos(deptoId) {
-  const data=await apiGet('depto_fotos',`&order=orden.asc`);
+  const data=await apiGet('depto_fotos',`&sort=orden`);
   allDeptoFotos=(data.data||[]).filter(f=>f.depto_id===deptoId).sort((a,b)=>(a.orden||99)-(b.orden||99));
   renderDeptoFotosList();
 }
@@ -1574,7 +1436,7 @@ function renderDeptoFotosList() {
   if(!allDeptoFotos.length){cont.innerHTML='<div class="empty-state" style="padding:1.5rem;"><i class="fa-solid fa-images"></i><h3>Sin fotos aún</h3><p>Agrega fotos usando el formulario de abajo.</p></div>';return;}
   cont.innerHTML=allDeptoFotos.map((f,i)=>`
     <div class="photo-item">
-      <img src="${imgSrc(f.imagen_url)}" alt="${f.titulo||''}" onerror="this.src='../images/201/01-living-sala.jpg'" />
+      <img src="../${f.imagen_url}" alt="${f.titulo||''}" onerror="this.src='../images/201/01-living-sala.jpg'" />
       <div class="photo-item-info">
         <div class="photo-item-name">${f.titulo||'Sin descripción'}</div>
         <div class="photo-item-url">${f.imagen_url}</div>
@@ -1664,10 +1526,10 @@ function renderHeroCarouselList() {
   if(!allHeroImgs.length){cont.innerHTML='<div class="empty-state"><i class="fa-solid fa-image"></i><h3>Sin imágenes en el carrusel</h3><p>Agrega la primera imagen con el botón de arriba.</p></div>';return;}
   // Update preview with first active image
   const firstActive=allHeroImgs.find(i=>i.activo!==false)||allHeroImgs[0];
-  if(firstActive) document.getElementById('heroPreviewImg').src=imgSrc(firstActive.imagen_url,'images/207/08-terraza-vista-volcan.jpg');
+  if(firstActive) document.getElementById('heroPreviewImg').src='../'+firstActive.imagen_url;
   cont.innerHTML=allHeroImgs.map((img,i)=>`
     <div class="carousel-item ${img.activo===false?'opacity:0.5;':''}">
-      <img src="${imgSrc(img.imagen_url,'images/207/08-terraza-vista-volcan.jpg')}" alt="${img.titulo||''}" onerror="this.src='../images/207/08-terraza-vista-volcan.jpg'" />
+      <img src="../${img.imagen_url}" alt="${img.titulo||''}" onerror="this.src='../images/207/08-terraza-vista-volcan.jpg'" />
       <div class="carousel-item-info">
         <strong>${img.titulo||'Sin título'}</strong>
         <span>${img.subtitulo||img.imagen_url}</span>
@@ -1693,7 +1555,7 @@ function openAddHeroModal() {
   document.getElementById('hero-id').value=''; document.getElementById('hero-url').value='';
   document.getElementById('hero-titulo').value=''; document.getElementById('hero-subtitulo').value='';
   document.getElementById('hero-orden').value=allHeroImgs.length+1; document.getElementById('hero-activo').checked=true;
-  clearUploadField('hero-url','prev-hero-url');
+  document.getElementById('heroModalPreview').style.display='none';
   openModal('modalHero');
 }
 function editHeroImg(id) {
@@ -1703,8 +1565,12 @@ function editHeroImg(id) {
   document.getElementById('hero-id').value=id; document.getElementById('hero-url').value=img.imagen_url||'';
   document.getElementById('hero-titulo').value=img.titulo||''; document.getElementById('hero-subtitulo').value=img.subtitulo||'';
   document.getElementById('hero-orden').value=img.orden||1; document.getElementById('hero-activo').checked=img.activo!==false;
-  previewFromUrlField(img.imagen_url||'','prev-hero-url');
-  openModal('modalHero');
+  previewHeroImg(); openModal('modalHero');
+}
+function previewHeroImg() {
+  const url=document.getElementById('hero-url').value.trim();
+  const prev=document.getElementById('heroModalPreview');
+  if(url){prev.src='../'+url; prev.style.display='block';}else{prev.style.display='none';}
 }
 async function saveHeroImg() {
   const url=document.getElementById('hero-url').value.trim();
@@ -1748,7 +1614,7 @@ function renderActividadesList() {
   if(!allActividades.length){cont.innerHTML='<div class="empty-state"><i class="fa-solid fa-map-location-dot"></i><h3>Sin actividades</h3></div>';return;}
   cont.innerHTML=allActividades.map((a,i)=>`
     <div class="content-item ${a.activo===false?'opacity:0.55;':''}">
-      <img src="${imgSrc(a.imagen_url,'images/207/07-terraza.jpg')}" alt="${a.titulo||''}" onerror="this.src='../images/207/07-terraza.jpg'" />
+      <img src="../${a.imagen_url||'images/207/07-terraza.jpg'}" alt="${a.titulo||''}" onerror="this.src='../images/207/07-terraza.jpg'" />
       <div class="content-item-body">
         <div class="content-item-title">${a.titulo||'Sin título'}
           <span style="font-size:0.7rem;margin-left:0.4rem;color:${a.activo===false?'var(--danger)':'var(--success)'};">${a.activo===false?'● Oculta':'● Activa'}</span>
@@ -1773,7 +1639,7 @@ function openAddActividadModal() {
   document.getElementById('act-id').value=''; document.getElementById('act-titulo').value='';
   document.getElementById('act-imagen').value=''; document.getElementById('act-desc').value='';
   document.getElementById('act-orden').value=allActividades.length+1; document.getElementById('act-activo').checked=true;
-  clearUploadField('act-imagen','prev-act-imagen');
+  document.getElementById('actImgPreview').style.display='none';
   openModal('modalActividad');
 }
 function editActividad(id) {
@@ -1783,8 +1649,12 @@ function editActividad(id) {
   document.getElementById('act-id').value=id; document.getElementById('act-titulo').value=a.titulo||'';
   document.getElementById('act-imagen').value=a.imagen_url||''; document.getElementById('act-desc').value=a.descripcion||'';
   document.getElementById('act-orden').value=a.orden||1; document.getElementById('act-activo').checked=a.activo!==false;
-  previewFromUrlField(a.imagen_url||'','prev-act-imagen');
-  openModal('modalActividad');
+  previewActImg(); openModal('modalActividad');
+}
+function previewActImg() {
+  const url=document.getElementById('act-imagen').value.trim();
+  const prev=document.getElementById('actImgPreview');
+  if(url){prev.src='../'+url;prev.style.display='block';}else{prev.style.display='none';}
 }
 async function saveActividad() {
   const titulo=document.getElementById('act-titulo').value.trim();
@@ -1829,7 +1699,7 @@ function renderAreasFotosList() {
   if(!allAreasFotos.length){cont.innerHTML='<div class="empty-state"><i class="fa-solid fa-building-columns"></i><h3>Sin fotos</h3></div>';return;}
   cont.innerHTML=allAreasFotos.map((f,i)=>`
     <div class="content-item">
-      <img src="${imgSrc(f.imagen_url,'images/comunes/juegos-infantiles.jpg')}" alt="${f.titulo||''}" onerror="this.src='../images/comunes/juegos-infantiles.jpg'" />
+      <img src="../${f.imagen_url||''}" alt="${f.titulo||''}" onerror="this.src='../images/comunes/juegos-infantiles.jpg'" />
       <div class="content-item-body">
         <div class="content-item-title">${f.titulo||'Sin título'} <span style="font-size:0.7rem;color:${f.activo===false?'var(--danger)':'var(--success)'};">${f.activo===false?'● Oculta':'● Activa'}</span></div>
         <div class="content-item-desc">${f.imagen_url}</div>
@@ -1849,8 +1719,7 @@ function openAddAreaModal() {
   document.getElementById('modalAreaTitle').textContent='Agregar foto de área común';
   document.getElementById('area-id').value=''; document.getElementById('area-url').value='';
   document.getElementById('area-titulo').value=''; document.getElementById('area-orden').value=allAreasFotos.length+1;
-  document.getElementById('area-activo').checked=true;
-  clearUploadField('area-url','prev-area-url');
+  document.getElementById('area-activo').checked=true; document.getElementById('areaImgPreview').style.display='none';
   openModal('modalArea');
 }
 function editAreaFoto(id) {
@@ -1859,9 +1728,12 @@ function editAreaFoto(id) {
   document.getElementById('modalAreaTitle').textContent='Editar foto de área común';
   document.getElementById('area-id').value=id; document.getElementById('area-url').value=f.imagen_url||'';
   document.getElementById('area-titulo').value=f.titulo||''; document.getElementById('area-orden').value=f.orden||1;
-  document.getElementById('area-activo').checked=f.activo!==false;
-  previewFromUrlField(f.imagen_url||'','prev-area-url');
-  openModal('modalArea');
+  document.getElementById('area-activo').checked=f.activo!==false; previewAreaImg(); openModal('modalArea');
+}
+function previewAreaImg() {
+  const url=document.getElementById('area-url').value.trim();
+  const prev=document.getElementById('areaImgPreview');
+  if(url){prev.src='../'+url;prev.style.display='block';}else{prev.style.display='none';}
 }
 async function saveAreaFoto() {
   const url=document.getElementById('area-url').value.trim();
@@ -1900,7 +1772,7 @@ function renderPlayaFotosList() {
   if(!allPlayaFotos.length){cont.innerHTML='<div class="empty-state"><i class="fa-solid fa-water"></i><h3>Sin fotos</h3></div>';return;}
   cont.innerHTML=allPlayaFotos.map((f,i)=>`
     <div class="content-item">
-      <img src="${imgSrc(f.imagen_url,'images/207/07-terraza.jpg')}" alt="${f.titulo||''}" onerror="this.src='../images/207/07-terraza.jpg'" />
+      <img src="../${f.imagen_url||''}" alt="${f.titulo||''}" onerror="this.src='../images/207/07-terraza.jpg'" />
       <div class="content-item-body">
         <div class="content-item-title">${f.titulo||'Sin título'} <span style="font-size:0.7rem;color:${f.activo===false?'var(--danger)':'var(--success)'};">${f.activo===false?'● Oculta':'● Activa'}</span></div>
         <div class="content-item-desc">${f.descripcion||f.imagen_url}</div>
@@ -1921,8 +1793,7 @@ function openAddPlayaModal() {
   document.getElementById('playa-id').value=''; document.getElementById('playa-url').value='';
   document.getElementById('playa-titulo').value=''; document.getElementById('playa-desc').value='';
   document.getElementById('playa-orden').value=allPlayaFotos.length+1; document.getElementById('playa-activo').checked=true;
-  clearUploadField('playa-url','prev-playa-url');
-  openModal('modalPlaya');
+  document.getElementById('playaImgPreview').style.display='none'; openModal('modalPlaya');
 }
 function editPlayaFoto(id) {
   const f=allPlayaFotos.find(x=>x.id===id); if(!f) return;
@@ -1931,8 +1802,12 @@ function editPlayaFoto(id) {
   document.getElementById('playa-id').value=id; document.getElementById('playa-url').value=f.imagen_url||'';
   document.getElementById('playa-titulo').value=f.titulo||''; document.getElementById('playa-desc').value=f.descripcion||'';
   document.getElementById('playa-orden').value=f.orden||1; document.getElementById('playa-activo').checked=f.activo!==false;
-  previewFromUrlField(f.imagen_url||'','prev-playa-url');
-  openModal('modalPlaya');
+  previewPlayaImg(); openModal('modalPlaya');
+}
+function previewPlayaImg() {
+  const url=document.getElementById('playa-url').value.trim();
+  const prev=document.getElementById('playaImgPreview');
+  if(url){prev.src='../'+url;prev.style.display='block';}else{prev.style.display='none';}
 }
 async function savePlayaFoto() {
   const url=document.getElementById('playa-url').value.trim();
@@ -1979,8 +1854,6 @@ const CMS_SCHEMA = [
     {key:'nosotros_p2',label:'Párrafo 2',type:'textarea',default:'Nuestros departamentos están ubicados en un condominio con piscina, gimnasio, lavandería, salón de eventos y cancha deportiva.'},
     {key:'nosotros_badge',label:'Badge (ej: 3 deptos hygge)',type:'text',default:'3 deptos hygge'},
     {key:'nosotros_cta',label:'Botón (texto)',type:'text',default:'Reserva tu estadía'},
-    {key:'nosotros_imagen_main',label:'Imagen principal (foto grande)',type:'upload',folder:'nosotros',default:''},
-    {key:'nosotros_imagen_sec',label:'Imagen secundaria (foto pequeña)',type:'upload',folder:'nosotros',default:''},
   ]},
   { id:'cms-deptos', label:'🏢 Sección Departamentos', icon:'fa-building', fields:[
     {key:'deptos_eyebrow',label:'Eyebrow',type:'text',default:'Elige tu espacio'},
@@ -2084,31 +1957,14 @@ function renderCMSSections() {
         </div>
       </div>
       <div class="cms-section-body" id="body-${section.id}">
-        ${section.fields.map(f => {
-          const val = cmsData[f.key]!==undefined ? cmsData[f.key] : f.default;
-          if (f.type==='upload') {
-            const previewStyle = val ? 'display:block' : 'display:none';
-            const imgSrc = val || '';
-            return `<div class="cms-field-row">
-              <label class="form-label" style="margin-bottom:0.3rem;display:block;">${f.label}</label>
-              <div class="upload-field">
-                <div class="upload-preview-wrap" id="prev-cms-${f.key}" style="${previewStyle}">
-                  <img src="${imgSrc}" alt="Preview" class="upload-preview-img" />
-                  <button type="button" class="upload-remove-btn" onclick="clearUploadField('cms-${f.key}','prev-cms-${f.key}')"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-                <div class="upload-actions-row">
-                  <input type="file" accept="image/*" id="file-cms-${f.key}" style="display:none" onchange="handleFileUpload(this,'cms-${f.key}','prev-cms-${f.key}','${f.folder||'cms'}')">
-                  <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('file-cms-${f.key}').click()"><i class="fa-solid fa-upload"></i> Subir foto</button>
-                  <span style="font-size:0.75rem;color:var(--mid);">o</span>
-                  <input type="text" class="form-control" id="cms-${f.key}" value="${imgSrc.replace(/"/g,'&quot;')}" placeholder="Pegar URL de imagen..." oninput="previewFromUrlField(this.value,'prev-cms-${f.key}')" style="flex:1;" />
-                </div>
-                <div class="upload-progress-wrap" id="prog-cms-${f.key}" style="display:none;"><div class="upload-progress-bar" id="progbar-cms-${f.key}"></div><span id="prog-label-cms-${f.key}">Subiendo...</span></div>
-              </div>
-            </div>`;
-          }
-          if (f.type==='textarea') return `<div class="cms-field-row"><label class="form-label" style="margin-bottom:0.3rem;display:block;">${f.label}</label><textarea class="form-control" id="cms-${f.key}" rows="3">${val}</textarea></div>`;
-          return `<div class="cms-field-row"><label class="form-label" style="margin-bottom:0.3rem;display:block;">${f.label}</label><input type="text" class="form-control" id="cms-${f.key}" value="${val.replace(/"/g,'&quot;')}" /></div>`;
-        }).join('')}
+        ${section.fields.map(f => `
+          <div class="cms-field-row">
+            <label class="form-label" style="margin-bottom:0.3rem;display:block;">${f.label}</label>
+            ${f.type==='textarea'
+              ? `<textarea class="form-control" id="cms-${f.key}" rows="3">${cmsData[f.key]!==undefined?cmsData[f.key]:f.default}</textarea>`
+              : `<input type="text" class="form-control" id="cms-${f.key}" value="${(cmsData[f.key]!==undefined?cmsData[f.key]:f.default).replace(/"/g,'&quot;')}" />`
+            }
+          </div>`).join('')}
       </div>
     </div>`).join('');
 }
@@ -2124,7 +1980,7 @@ async function saveCMSSection(sectionId) {
     const valor=el.value;
     const existing=Object.entries(cmsData).find(([k])=>k===f.key);
     // Check if record exists
-    const res=await apiGet('cms_textos',`&campo=eq.${encodeURIComponent(f.key)}`);
+    const res=await apiGet('cms_textos',`&search=${encodeURIComponent(f.key)}`);
     const rows=(res.data||[]).filter(r=>r.campo===f.key);
     if(rows.length>0){await apiPatch('cms_textos',rows[0].id,{valor,seccion:sectionId,campo:f.key});}
     else{await apiPost('cms_textos',{id:f.key,seccion:sectionId,campo:f.key,valor,tipo:f.type||'text'});}
@@ -2153,7 +2009,7 @@ function renderNoticiasList() {
   if(!allNoticias.length){list.innerHTML='<div class="empty-state"><i class="fa-solid fa-newspaper"></i><h3>Sin noticias</h3></div>';return;}
   list.innerHTML=allNoticias.map(n=>`
     <div class="post-item">
-      <img class="post-thumb" src="${imgSrc(n.imagen_portada,'images/207/08-terraza-vista-volcan.jpg')}" alt="${n.titulo}" onerror="this.src='../images/207/08-terraza-vista-volcan.jpg'" />
+      <img class="post-thumb" src="../${n.imagen_portada||'images/207/08-terraza-vista-volcan.jpg'}" alt="${n.titulo}" onerror="this.src='../images/207/08-terraza-vista-volcan.jpg'" />
       <div class="post-info"><h4>${n.titulo||'Sin título'}</h4><p>${n.resumen||''}</p>
         <div class="post-meta">
           <span class="badge" style="background:var(--cream-d);color:var(--earth);">${n.categoria||'Sin cat.'}</span>
@@ -2175,7 +2031,6 @@ function openNewNoticiaModal() {
   ['n-titulo','n-resumen','n-contenido','n-imagen'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('n-categoria').value='Novedad'; document.getElementById('n-fecha').value=todayStr();
   document.getElementById('n-autor').value='Pucon Hygge Stays'; document.getElementById('n-publicado').checked=true;
-  clearUploadField('n-imagen','prev-n-imagen');
   openModal('modalNoticia');
 }
 function editNoticia(id) {
@@ -2186,7 +2041,6 @@ function editNoticia(id) {
   document.getElementById('n-fecha').value=n.fecha_publicacion||todayStr(); document.getElementById('n-resumen').value=n.resumen||'';
   document.getElementById('n-contenido').value=n.contenido||''; document.getElementById('n-imagen').value=n.imagen_portada||'';
   document.getElementById('n-autor').value=n.autor||'Pucon Hygge Stays'; document.getElementById('n-publicado').checked=!!n.publicado;
-  previewFromUrlField(n.imagen_portada||'','prev-n-imagen');
   openModal('modalNoticia');
 }
 async function saveNoticia() {
@@ -2212,84 +2066,33 @@ async function deleteNoticia(id,titulo) {
 }
 
 /* ═══════════════════════════════════════════
-   GALERÍA (Supabase Storage)
+   GALLERY
 ═══════════════════════════════════════════ */
-let allGaleria = [];
-let editingGaleriaId = null;
-
-async function loadGaleria() {
-  const d = await apiGet('galeria_fotos', '&order=orden.asc,created_at.desc');
-  allGaleria = d.data || [];
-  renderGaleriaGrid();
-}
-
-function renderGaleriaGrid() {
-  const grid = document.getElementById('galeria-grid');
-  if (!allGaleria.length) {
-    grid.innerHTML = '<div class="empty-state"><i class="fa-solid fa-images"></i><h3>Sin fotos en la galería</h3><p>Sube la primera foto con el botón "Subir foto".</p></div>';
-    return;
-  }
-  grid.innerHTML = allGaleria.map(f => `
+function renderGallery() {
+  const imgs201=[
+    '../images/201/01-living-sala.jpg','../images/201/02-dormitorio-principal.jpg','../images/201/03-cocina-comedor.jpg',
+    '../images/201/04-living-cocina.jpg','../images/201/05-dormitorio-literas.jpg','../images/201/06-terraza.jpg',
+    '../images/201/07-bano.jpg','../images/201/08-pasillo-macrame.jpg'
+  ];
+  const imgs207=[
+    '../images/207/01-sala-living-1.jpg','../images/207/02-sala-living-2.jpg','../images/207/03-dormitorio-principal.jpg',
+    '../images/207/04-dormitorio-2.jpg','../images/207/05-dormitorio-3-twin.jpg','../images/207/06-cocina-comedor.jpg',
+    '../images/207/07-terraza.jpg','../images/207/08-terraza-vista-volcan.jpg','../images/207/09-bano.jpg',
+    '../images/207/10-dormitorio-individual.jpg','../images/207/11-bano-2.jpg','../images/207/12-cocina-2.jpg',
+    '../images/207/13-decoracion.jpg','../images/207/14-dormitorio-detalle.jpg'
+  ];
+  const imgsC=['../images/comunes/juegos-infantiles.jpg','../images/comunes/lavanderia.jpg','../images/comunes/ski-telecabina.jpg'];
+  const renderItems=imgs=>imgs.map(src=>`
     <div class="gallery-item">
-      <img src="${f.imagen_url}" alt="${f.titulo||''}" loading="lazy"
-        onerror="this.src='data:image/svg+xml,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'120\\' height=\\'80\\'><rect fill=\\'%23e8e0d5\\'/><text x=\\'50%\\' y=\\'50%\\' fill=\\'%23999\\' font-size=\\'12\\' text-anchor=\\'middle\\' dominant-baseline=\\'middle\\'>Sin imagen</text></svg>'" />
+      <img src="${src}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'" />
       <div class="gallery-item-overlay">
-        <button class="btn-icon" style="background:rgba(255,255,255,0.9);" onclick="editGaleriaFoto('${f.id}')" title="Editar"><i class="fa-solid fa-pen"></i></button>
-        <button class="btn-icon danger" style="background:rgba(255,255,255,0.9);" onclick="deleteGaleriaFoto('${f.id}','${(f.titulo||'foto').replace(/'/g,'\\\'')}')" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-      </div>
-      <div style="padding:0.4rem 0.5rem;font-size:0.75rem;color:var(--mid);background:#fff;">
-        ${f.activo ? '<span style="color:var(--success);">● Activa</span>' : '<span style="color:#ccc;">● Oculta</span>'}
-        ${f.categoria ? `<span style="margin-left:0.4rem;background:var(--cream-d);border-radius:4px;padding:0 0.3rem;">${f.categoria}</span>` : ''}
+        <button class="btn-icon" style="background:rgba(255,255,255,0.9);" onclick="navigator.clipboard.writeText('${src.replace('../','')}');showToast('Ruta copiada: ${src.replace('../','')}','info',4000)">
+          <i class="fa-solid fa-copy"></i></button>
       </div>
     </div>`).join('');
-}
-
-function openNewGaleriaModal() {
-  editingGaleriaId = null;
-  document.getElementById('modalGaleriaTitle').textContent = 'Subir foto a la galería';
-  document.getElementById('gal-id').value = '';
-  document.getElementById('gal-url').value = '';
-  document.getElementById('gal-titulo').value = '';
-  document.getElementById('gal-orden').value = (allGaleria.length + 1);
-  document.getElementById('gal-categoria').value = 'general';
-  document.getElementById('gal-activo').checked = true;
-  clearUploadField('gal-url', 'prev-gal-url');
-  openModal('modalGaleria');
-}
-
-function editGaleriaFoto(id) {
-  const f = allGaleria.find(x => x.id === id); if (!f) return;
-  editingGaleriaId = id;
-  document.getElementById('modalGaleriaTitle').textContent = 'Editar foto de galería';
-  document.getElementById('gal-id').value = f.id;
-  document.getElementById('gal-url').value = f.imagen_url || '';
-  document.getElementById('gal-titulo').value = f.titulo || '';
-  document.getElementById('gal-orden').value = f.orden || 1;
-  document.getElementById('gal-categoria').value = f.categoria || 'general';
-  document.getElementById('gal-activo').checked = !!f.activo;
-  previewFromUrlField(f.imagen_url || '', 'prev-gal-url');
-  openModal('modalGaleria');
-}
-
-async function saveGaleriaFoto() {
-  const url = document.getElementById('gal-url').value.trim();
-  if (!url) { showToast('La imagen es obligatoria.', 'error'); return; }
-  const data = {
-    imagen_url: url,
-    titulo: document.getElementById('gal-titulo').value,
-    categoria: document.getElementById('gal-categoria').value,
-    orden: parseInt(document.getElementById('gal-orden').value) || 1,
-    activo: document.getElementById('gal-activo').checked
-  };
-  if (editingGaleriaId) { await apiPatch('galeria_fotos', editingGaleriaId, data); showToast('✅ Foto actualizada'); }
-  else { await apiPost('galeria_fotos', data); showToast('✅ Foto subida a la galería'); }
-  closeModal('modalGaleria'); await loadGaleria();
-}
-
-async function deleteGaleriaFoto(id, titulo) {
-  showConfirm('¿Eliminar foto?', `Se eliminará "${titulo}" de la galería.`, 'Eliminar', 'btn-danger', async () => {
-    await apiDelete('galeria_fotos', id); showToast('Foto eliminada', 'warning'); await loadGaleria();
-  }, 'warning');
+  document.getElementById('gallery201').innerHTML=renderItems(imgs201);
+  document.getElementById('gallery207').innerHTML=renderItems(imgs207);
+  document.getElementById('galleryComunes').innerHTML=renderItems(imgsC);
 }
 
 /* ═══════════════════════════════════════════
@@ -2343,15 +2146,22 @@ async function refreshFrontEnd() {
   // Verificar que los datos estén guardados
   let resumen = [];
   try {
-    const h = supaHeaders();
+    // Helper local: hace HEAD/GET con auth y devuelve el label correcto según el status
+    const _check = (table, ok, fail) => {
+      const u = new URL(`${_SUPA.url}${encodeURIComponent(table)}`);
+      u.searchParams.set('select', 'id');
+      u.searchParams.set('limit', '1');
+      return fetch(u.toString(), { headers: _SUPA.headers() })
+        .then(r => r.ok ? ok : fail)
+        .catch(() => fail);
+    };
     const checks = await Promise.all([
-      fetch(supaUrl('hero_carousel','&limit=1'),{headers:h}).then(r=>r.ok?'✅ Carrusel Hero':'⚠️ Carrusel'),
-      fetch(supaUrl('actividades_pucon','&limit=1'),{headers:h}).then(r=>r.ok?'✅ Actividades Pucón':'⚠️ Actividades'),
-      fetch(supaUrl('areas_comunes_fotos','&limit=1'),{headers:h}).then(r=>r.ok?'✅ Áreas Comunes':'⚠️ Áreas Comunes'),
-      fetch(supaUrl('playa_fotos','&limit=1'),{headers:h}).then(r=>r.ok?'✅ Fotos Playa':'⚠️ Playa'),
-      fetch(supaUrl('depto_fotos','&limit=1'),{headers:h}).then(r=>r.ok?'✅ Fotos Deptos':'⚠️ Deptos'),
-      fetch(supaUrl('galeria_fotos','&limit=1'),{headers:h}).then(r=>r.ok?'✅ Galería':'⚠️ Galería'),
-      fetch(supaUrl('cms_textos','&limit=1'),{headers:h}).then(r=>r.ok?'✅ Textos CMS':'⚠️ CMS'),
+      _check('hero_carousel',      '✅ Carrusel Hero',     '⚠️ Carrusel'),
+      _check('actividades_pucon',  '✅ Actividades Pucón', '⚠️ Actividades'),
+      _check('areas_comunes_fotos','✅ Áreas Comunes',     '⚠️ Áreas Comunes'),
+      _check('playa_fotos',        '✅ Fotos Playa',       '⚠️ Playa'),
+      _check('depto_fotos',        '✅ Fotos Deptos',      '⚠️ Deptos'),
+      _check('cms_textos',         '✅ Textos CMS',        '⚠️ CMS'),
     ]);
     resumen = checks;
   } catch(e) {
