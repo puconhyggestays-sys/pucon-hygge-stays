@@ -1435,6 +1435,53 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
+/* ═══════════════════════════════════════════════
+   SUPABASE REST API — config + helpers
+   ═══════════════════════════════════════════════ */
+const SUPABASE = (() => {
+  const url = 'https://vpoutrwyrtcwsvwhumwz.supabase.co/rest/v1/';
+  const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwb3V0cnd5cnRjd3N2d2h1bXd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTg1NDUsImV4cCI6MjA5MjUzNDU0NX0.fO0eDhVcOntA0muHFGNG8K3kwgahRVyBTMv_p7rLvDY';
+  const baseHeaders = {
+    'apikey': key,
+    'Authorization': `Bearer ${key}`,
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  };
+  async function insert(table, payload) {
+    return fetch(`${url}${encodeURIComponent(table)}`, {
+      method: 'POST',
+      headers: { ...baseHeaders, 'Prefer': 'return=minimal' },
+      body: JSON.stringify(payload)
+    });
+  }
+  async function select(table, opts = {}) {
+    const { page = 1, limit = 100, order, filters = {} } = opts;
+    const u = new URL(`${url}${encodeURIComponent(table)}`);
+    u.searchParams.set('select', '*');
+    if (order) {
+      u.searchParams.set('order', order.startsWith('-') ? `${order.slice(1)}.desc` : `${order}.asc`);
+    }
+    Object.entries(filters).forEach(([k, v]) => u.searchParams.set(k, v));
+    const offset = (page - 1) * limit;
+    u.searchParams.set('limit', String(limit));
+    u.searchParams.set('offset', String(offset));
+    const res = await fetch(u.toString(), {
+      method: 'GET',
+      headers: { ...baseHeaders, 'Prefer': 'count=exact' }
+    });
+    if (!res.ok) return { data: [], total: 0, ok: false };
+    const data = await res.json();
+    let total = Array.isArray(data) ? data.length : 0;
+    const range = res.headers.get('Content-Range');
+    if (range) {
+      const parsed = parseInt(range.split('/')[1], 10);
+      if (!Number.isNaN(parsed)) total = parsed;
+    }
+    return { data: Array.isArray(data) ? data : [], total, ok: true };
+  }
+  return { insert, select };
+})();
+
 /* 1. NAVIGATION */
 (function initNav() {
   const header = $('#header');
@@ -1699,11 +1746,7 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     };
 
     try {
-      await fetch('tables/reservas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+      await SUPABASE.insert('reservas', data);
     } catch(err) { /* silent */ }
 
     setTimeout(() => {
@@ -1733,16 +1776,12 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
     try {
-      await fetch('tables/mensajes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: form.name.value.trim(),
-          email: form.email.value.trim(),
-          subject: form.subject?.value || '',
-          message: form.message.value.trim(),
-          timestamp: new Date().toISOString()
-        })
+      await SUPABASE.insert('mensajes', {
+        name: form.name.value.trim(),
+        email: form.email.value.trim(),
+        subject: form.subject?.value || '',
+        message: form.message.value.trim(),
+        timestamp: new Date().toISOString()
       });
     } catch(err) { /* silent */ }
     setTimeout(() => {
@@ -1933,11 +1972,10 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
   async function fetchBlocks(apt) {
     try {
-      const res = await fetch('tables/fechas_bloqueadas?limit=200');
-      if (!res.ok) return {};
-      const data = await res.json();
+      const { data, ok } = await SUPABASE.select('fechas_bloqueadas', { limit: 200 });
+      if (!ok) return {};
       const map = {};
-      (data.data || []).forEach(b => {
+      data.forEach(b => {
         if (b.apartment_slug !== apt) return;
         const ci = new Date(b.fecha_inicio + 'T00:00:00');
         const co = new Date(b.fecha_fin + 'T00:00:00');
@@ -2062,10 +2100,12 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
   async function loadNews(pg) {
     try {
-      const res = await fetch(`tables/noticias?page=${pg}&limit=${limit}&sort=-created_at`);
-      if (!res.ok) throw new Error('no data');
-      const json = await res.json();
-      return json;
+      const { data, total, ok } = await SUPABASE.select('noticias', {
+        page: pg, limit: limit, order: '-created_at'
+      });
+      if (!ok) throw new Error('no data');
+      // Mantener formato { data, total } que el resto del código espera
+      return { data, total };
     } catch { return null; }
   }
 
