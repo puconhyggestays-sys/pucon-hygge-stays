@@ -701,7 +701,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
         <li><a href="#disponibilidad" class="nav-link">Disponibilidad</a></li>
         <li><a href="#noticias" class="nav-link">Blog</a></li>
         <li><a href="#contacto" class="nav-link">Contacto</a></li>
-        <li><a href="#reserva" class="nav-cta">Reservar</a></li>
+        <li><a href="https://wa.me/56958771006?text=Hola%2C%20me%20interesa%20reservar%20en%20Pucon%20Hygge%20Stays%20%F0%9F%8F%94%EF%B8%8F" target="_blank" rel="noopener" class="nav-cta"><i class="fa-brands fa-whatsapp"></i> Reservar</a></li>
       </ul>
       <button class="nav-hamburger" id="navHamburger" aria-label="Menú">
         <span></span><span></span><span></span>
@@ -720,11 +720,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
       <h1 class="hero-title" id="cms-hero-title">Donde el volcán<br/><em>se convierte en hogar</em></h1>
       <p class="hero-subtitle" id="cms-hero-subtitle">Departamentos con alma hygge, diseñados para el descanso profundo. Piscina, gimnasio, acceso privado al lago Villarrica y todo Pucón a tus pies.</p>
       <div class="hero-actions">
-        <a href="#reserva" class="btn btn-primary" id="cms-hero-cta">Reservar ahora</a>
+        <a href="https://wa.me/56958771006?text=Hola%2C%20me%20interesa%20reservar%20en%20Pucon%20Hygge%20Stays%20%F0%9F%8F%94%EF%B8%8F" target="_blank" rel="noopener" class="btn btn-primary" id="cms-hero-cta"><i class="fa-brands fa-whatsapp"></i> Reservar por WhatsApp</a>
         <a href="#departamentos" class="btn btn-ghost" id="cms-hero-cta2">Ver departamentos</a>
       </div>
       <div class="hero-stats">
-        <div class="stat"><strong id="cms-stat1-val">3</strong><span id="cms-stat1-label">Departamentos</span></div>
+        <div class="stat"><strong id="cms-stat1-val" data-auto-count-deptos="true">3</strong><span id="cms-stat1-label">Departamentos</span></div>
         <div class="stat-divider"></div>
         <div class="stat"><strong id="cms-stat2-val">100%</strong><span id="cms-stat2-label">Equipados</span></div>
       </div>
@@ -792,7 +792,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
       </div>
       <div class="apartments-grid">
         <!-- DEPTO 201 — hasta 5 personas -->
-        <article class="apt-card">
+        <article class="apt-card" id="card-volcan" data-depto="volcan">
           <div class="apt-card-image">
             <div class="apt-slider" id="slider-201">
               <div class="apt-slides">
@@ -828,13 +828,13 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
                 <span class="price-amount">$75.000</span>
                 <span class="price-per">/ noche</span>
               </div>
-              <a href="#reserva" class="btn btn-primary btn-sm" data-apt="Volcán">Reservar</a>
+              <a href="https://wa.me/56958771006?text=Hola%2C%20me%20interesa%20reservar%20el%20Depto.%20Volc%C3%A1n%20en%20Pucon%20Hygge%20Stays%20%F0%9F%8C%8B" target="_blank" rel="noopener" class="btn btn-primary btn-sm"><i class="fa-brands fa-whatsapp"></i> Reservar</a>
             </div>
           </div>
         </article>
 
         <!-- DEPTO 207 — hasta 6 personas (FEATURED) -->
-        <article class="apt-card apt-card-featured">
+        <article class="apt-card apt-card-featured" id="card-lago" data-depto="lago">
           <div class="apt-card-image">
             <div class="apt-slider" id="slider-207">
               <div class="apt-slides">
@@ -876,13 +876,13 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
                 <span class="price-amount">$95.000</span>
                 <span class="price-per">/ noche</span>
               </div>
-              <a href="#reserva" class="btn btn-primary btn-sm" data-apt="Lago">Reservar</a>
+              <a href="https://wa.me/56958771006?text=Hola%2C%20me%20interesa%20reservar%20el%20Depto.%20Lago%20en%20Pucon%20Hygge%20Stays%20%F0%9F%8F%94%EF%B8%8F" target="_blank" rel="noopener" class="btn btn-primary btn-sm"><i class="fa-brands fa-whatsapp"></i> Reservar</a>
             </div>
           </div>
         </article>
 
         <!-- DEPTO BOSQUE -->
-        <article class="apt-card" id="card-bosque">
+        <article class="apt-card" id="card-bosque" data-depto="bosque">
           <div class="apt-card-image">
             <div class="apt-slider" id="slider-bosque">
               <div class="apt-slides">
@@ -910,7 +910,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
                 <span class="price-amount">$65.000</span>
                 <span class="price-per">/ noche</span>
               </div>
-              <a href="#reserva" class="btn btn-primary btn-sm" data-apt="Bosque">Reservar</a>
+              <a href="https://wa.me/56958771006?text=Hola%2C%20me%20interesa%20reservar%20el%20Depto.%20Bosque%20en%20Pucon%20Hygge%20Stays%20%F0%9F%8C%B2" target="_blank" rel="noopener" class="btn btn-primary btn-sm"><i class="fa-brands fa-whatsapp"></i> Reservar</a>
             </div>
           </div>
         </article>
@@ -1136,7 +1136,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
             <p class="testi-text">"Fuimos 5 personas al depto grande y nos sobró espacio. La cocina estaba perfecta para cocinar, el salón con parrilla fue el punto alto del viaje. Y bajar caminando a la playa privada fue increíble. Muy recomendado."</p>
             <div class="testi-author"><div class="testi-avatar">R</div><div><strong>Rodrigo V.</strong><span>Temuco · Febrero 2025</span></div></div>
           </div>
-          <div class="testi-card">
+          <div class="testi-card" data-depto="bosque">
             <div class="testi-stars">★★★★★</div>
             <p class="testi-text">"Fuimos de luna de miel y fue perfecto. El departamento Bosque tiene una atmósfera muy íntima y acogedora. La respuesta por WhatsApp fue inmediata. ¡Volveremos!"</p>
             <div class="testi-author"><div class="testi-avatar">A</div><div><strong>Andrea &amp; Tomás</strong><span>Buenos Aires · Marzo 2025</span></div></div>
@@ -1161,104 +1161,17 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
       </div>
       <!-- Apt selector -->
       <div style="display:flex;justify-content:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;">
-        <button class="av-apt-btn active" data-apt="volcan" onclick="avCalChangeApt('volcan')">Volcán #201</button>
-        <button class="av-apt-btn" data-apt="lago" onclick="avCalChangeApt('lago')">Lago #207</button>
-        <button class="av-apt-btn" data-apt="bosque" onclick="avCalChangeApt('bosque')">Bosque</button>
+        <button class="av-apt-btn active" data-apt="volcan" data-depto="volcan" onclick="avCalChangeApt('volcan')">Volcán #201</button>
+        <button class="av-apt-btn" data-apt="lago" data-depto="lago" onclick="avCalChangeApt('lago')">Lago #207</button>
+        <button class="av-apt-btn" data-apt="bosque" data-depto="bosque" onclick="avCalChangeApt('bosque')">Bosque</button>
       </div>
       <div style="max-width:480px;margin:0 auto;">
         <div id="availabilityCalendar" class="av-calendar-wrap"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════ RESERVA ═══════════════════ -->
-  <section class="booking section" id="reserva">
-    <div class="container">
-      <div class="booking-inner">
-        <div class="booking-info">
-          <p class="section-eyebrow">Reserva online</p>
-          <h2 class="section-title">Asegura tu<br/><em>estadía ahora</em></h2>
-          <p class="booking-text">Completa el formulario y nos pondremos en contacto contigo en menos de 2 horas para confirmar disponibilidad y enviarte el link de pago seguro.</p>
-          <div class="booking-highlights">
-            <div class="bh-item"><i class="fa-solid fa-clock"></i><span>Confirmación en menos de 2 hrs</span></div>
-            <div class="bh-item"><i class="fa-solid fa-shield-check"></i><span>Pago 100% seguro</span></div>
-            <div class="bh-item"><i class="fa-solid fa-rotate-left"></i><span>Cancelación hasta 72 hrs antes</span></div>
-            <div class="bh-item"><i class="fa-brands fa-whatsapp"></i><span>Atención directa por WhatsApp</span></div>
-          </div>
-          <div class="booking-payment">
-            <p class="payment-title">Medios de pago disponibles</p>
-            <div class="payment-methods">
-              <div class="pay-badge"><i class="fa-solid fa-building-columns"></i> Transferencia</div>
-              <div class="pay-badge"><i class="fa-solid fa-credit-card"></i> Tarjeta (Flow)</div>
-              <div class="pay-badge"><i class="fa-brands fa-paypal"></i> PayPal</div>
-            </div>
-            <p class="payment-note">50% al confirmar · 50% al hacer check-in</p>
-          </div>
-        </div>
-        <div class="booking-form-wrap">
-          <form class="booking-form" id="bookingForm">
-            <h3 class="form-title">Solicitar reserva</h3>
-            <div class="form-row">
-              <div class="form-group"><label for="bookName">Nombre completo *</label><input type="text" id="bookName" name="name" placeholder="Tu nombre" required /></div>
-              <div class="form-group"><label for="bookEmail">Correo electrónico *</label><input type="email" id="bookEmail" name="email" placeholder="tu@email.com" required /></div>
-            </div>
-            <div class="form-row">
-              <div class="form-group"><label for="bookPhone">WhatsApp / teléfono *</label><input type="tel" id="bookPhone" name="phone" placeholder="+56 9 ..." required /></div>
-              <div class="form-group">
-                <label for="bookApt">Departamento *</label>
-                <select id="bookApt" name="apartment" required>
-                  <option value="">Selecciona...</option>
-                  <option value="Volcán">Depto. Volcán (2 dorm · 5 pax)</option>
-                  <option value="Lago">Depto. Lago (3 dorm · 6 pax)</option>
-                  <option value="Bosque">Depto. Bosque (2 dorm · 3 pax)</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group"><label for="bookCheckin">Check-in *</label><input type="date" id="bookCheckin" name="checkin" required /></div>
-              <div class="form-group"><label for="bookCheckout">Check-out *</label><input type="date" id="bookCheckout" name="checkout" required /></div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="bookGuests">N° de huéspedes *</label>
-                <select id="bookGuests" name="guests" required>
-                  <option value="">Selecciona...</option>
-                  <option value="1">1 persona</option>
-                  <option value="2">2 personas</option>
-                  <option value="3">3 personas</option>
-                  <option value="4">4 personas</option>
-                  <option value="5">5 personas</option>
-                  <option value="6">6 personas</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="bookSource">¿Cómo nos encontraste?</label>
-                <select id="bookSource" name="source">
-                  <option value="">Selecciona...</option>
-                  <option value="instagram">Instagram</option>
-                  <option value="recomendacion">Recomendación</option>
-                  <option value="google">Google</option>
-                  <option value="booking">Booking / Airbnb</option>
-                  <option value="otro">Otro</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group form-group-full">
-              <label for="bookMessage">Comentarios o peticiones especiales</label>
-              <textarea id="bookMessage" name="message" placeholder="¿Alguna petición especial? ¿Viajan con mascotas? ¿Celebran algo? ¿Necesitan el servicio de Van?" rows="3"></textarea>
-            </div>
-            <div class="booking-summary" id="bookingSummary" style="display:none">
-              <div class="summary-inner"><strong>Resumen de tu reserva</strong><div id="summaryDetails"></div></div>
-            </div>
-            <button type="submit" class="btn btn-primary btn-full"><i class="fa-solid fa-paper-plane"></i> Solicitar reserva</button>
-            <p class="form-note">Al enviar aceptas que nos pongamos en contacto contigo por WhatsApp y email para confirmar tu reserva.</p>
-          </form>
-          <div class="booking-success" id="bookingSuccess" style="display:none">
-            <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
-            <h3>¡Solicitud enviada!</h3>
-            <p>Recibimos tu solicitud para el <strong id="successApt"></strong>. Te contactaremos en menos de 2 horas por WhatsApp para confirmar disponibilidad.</p>
-            <a href="https://wa.me/56958771006" target="_blank" class="btn btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> Escribirnos ahora</a>
-          </div>
+        <div style="text-align:center;margin-top:1.5rem;">
+          <a href="https://wa.me/56958771006?text=Hola%2C%20vi%20el%20calendario%20y%20quisiera%20consultar%20por%20una%20reserva%20en%20Pucon%20Hygge%20Stays%20%F0%9F%8F%94%EF%B8%8F" target="_blank" rel="noopener" class="btn btn-whatsapp">
+            <i class="fa-brands fa-whatsapp"></i> Reservar por WhatsApp
+          </a>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0.75rem;">Te confirmamos disponibilidad y precio final en minutos.</p>
         </div>
       </div>
     </div>
@@ -1381,10 +1294,10 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
         <div class="footer-links">
           <h4>Departamentos</h4>
           <ul>
-            <li><a href="#departamentos">Depto. Volcán</a></li>
-            <li><a href="#departamentos">Depto. Lago</a></li>
-            <li><a href="#departamentos">Depto. Bosque</a></li>
-            <li><a href="#reserva">Reservar ahora</a></li>
+            <li data-depto="volcan"><a href="#departamentos">Depto. Volcán</a></li>
+            <li data-depto="lago"><a href="#departamentos">Depto. Lago</a></li>
+            <li data-depto="bosque"><a href="#departamentos">Depto. Bosque</a></li>
+            <li><a href="https://wa.me/56958771006?text=Hola%2C%20me%20interesa%20reservar%20en%20Pucon%20Hygge%20Stays%20%F0%9F%8F%94%EF%B8%8F" target="_blank" rel="noopener">Reservar por WhatsApp</a></li>
           </ul>
         </div>
         <div class="footer-links">
@@ -1678,89 +1591,6 @@ const SUPABASE = (() => {
         q.nextElementSibling.classList.add('open');
       }
     });
-  });
-})();
-
-/* 6. BOOKING FORM */
-(function initBookingForm() {
-  const form = $('#bookingForm');
-  const success = $('#bookingSuccess');
-  const successApt = $('#successApt');
-  const checkin = $('#bookCheckin');
-  const checkout = $('#bookCheckout');
-  const aptSelect = $('#bookApt');
-  const summary = $('#bookingSummary');
-  const summaryDetails = $('#summaryDetails');
-  if (!form) return;
-
-  const todayStr = new Date().toISOString().split('T')[0];
-  checkin.min = todayStr;
-
-  checkin.addEventListener('change', () => {
-    const d = new Date(checkin.value);
-    d.setDate(d.getDate() + 2);
-    checkout.min = d.toISOString().split('T')[0];
-    if (checkout.value && checkout.value <= checkin.value) checkout.value = '';
-    updateSummary();
-  });
-
-  checkout.addEventListener('change', updateSummary);
-  aptSelect.addEventListener('change', updateSummary);
-
-  $$('[data-apt]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (aptSelect) { aptSelect.value = btn.dataset.apt; updateSummary(); }
-    });
-  });
-
-  function updateSummary() {
-    if (!checkin.value || !checkout.value || !aptSelect.value) { summary.style.display = 'none'; return; }
-    const nights = Math.ceil((new Date(checkout.value) - new Date(checkin.value)) / (1000 * 60 * 60 * 24));
-    if (nights <= 0) { summary.style.display = 'none'; return; }
-    const prices = { 'Volcán': 75000, 'Lago': 95000, 'Bosque': 65000 };
-    const price = prices[aptSelect.value] || 0;
-    const total = price * nights;
-    const fmt = d => { const [y,m,dd] = d.split('-'); return `${dd}/${m}/${y}`; };
-    const playa = nights >= 3 ? '<span style="color:var(--ocean);font-weight:600;">🏖️ Incluye 1 día de playa privada</span>' : '';
-    summaryDetails.innerHTML = `<div style="display:flex;flex-direction:column;gap:4px;margin-top:6px;"><span>🏡 <strong>Depto. ${aptSelect.value}</strong></span><span>📅 ${fmt(checkin.value)} → ${fmt(checkout.value)} · ${nights} noche${nights !== 1 ? 's' : ''}</span><span>💰 Estimado: <strong>$${total.toLocaleString('es-CL')} CLP</strong> (desde $${price.toLocaleString('es-CL')}/noche)</span>${playa}<small style="color:#999;margin-top:2px;">*Tarifa estimada. Precio final confirmado por WhatsApp.</small></div>`;
-    summary.style.display = 'block';
-  }
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = form.querySelector('[type="submit"]');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
-
-    const data = {
-      name: form.name.value.trim(),
-      email: form.email.value.trim(),
-      phone: form.phone.value.trim(),
-      apartment: form.apartment.value,
-      checkin: form.checkin.value,
-      checkout: form.checkout.value,
-      guests: form.guests.value,
-      source: form.source?.value || '',
-      message: form.message?.value.trim() || '',
-      timestamp: new Date().toISOString()
-    };
-
-    try {
-      await SUPABASE.insert('reservas', data);
-    } catch(err) { /* silent */ }
-
-    setTimeout(() => {
-      form.style.display = 'none';
-      success.style.display = 'block';
-      successApt.textContent = `Departamento ${data.apartment}`;
-      success.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 600);
-
-    const waMsg = encodeURIComponent(`Hola! Quiero reservar en Pucon Hygge Stays 🏔️\n\n👤 Nombre: ${data.name}\n🏡 Depto: ${data.apartment}\n📅 Check-in: ${data.checkin}\n📅 Check-out: ${data.checkout}\n👥 Huéspedes: ${data.guests}\n📱 Teléfono: ${data.phone}\n${data.message ? '💬 Notas: ' + data.message : ''}`);
-    setTimeout(() => {
-      const waLink = success.querySelector('.btn-whatsapp');
-      if (waLink) waLink.href = `https://wa.me/56958771006?text=${waMsg}`;
-    }, 700);
   });
 })();
 
