@@ -354,21 +354,13 @@ async function loadDepartamentosFotos() {
     'lago': 'slider-207',
     'bosque': 'slider-bosque'
   };
-  const cardMap = {
-    'volcan': document.getElementById('card-volcan'),
-    'lago': document.getElementById('card-lago'),
-    'bosque': document.getElementById('card-bosque')
-  };
 
   sorted.forEach(d => {
     const slug = aptSlugLocal(d.nombre);
     const sliderId = slugMap[slug];
-    const card = cardMap[slug];
 
-    // Visibilidad del departamento
-    if (card) {
-      card.style.display = d.activo === false ? 'none' : '';
-    }
+    // NOTA: la visibilidad del depto (mostrar/ocultar la card)
+    // la gestiona loadDepartamentosVisibility() — no la duplicamos aquí.
 
     if (!sliderId) return;
     const fotos = fotosMap[d.id] || [];
@@ -531,22 +523,55 @@ async function loadPlayaFotos() {
 
 /* ═══════════════════════════════════════════
    7. VISIBILIDAD DE DEPARTAMENTOS (activo/oculto)
+   Oculta TODOS los elementos del front que mencionan
+   un departamento marcado como inactivo en el admin.
+   Cualquier elemento del HTML con [data-depto="slug"]
+   se oculta cuando ese depto.activo === false.
 ═══════════════════════════════════════════ */
 async function loadDepartamentosVisibility() {
   const deptos = await cmsApi('departamentos', '&sort=orden');
   if (!deptos.length) return;
 
-  const slugMap = {
-    'volcan': document.querySelector('#slider-201')?.closest('article.apt-card'),
-    'lago': document.querySelector('#slider-207')?.closest('article.apt-card'),
-    'bosque': document.querySelector('.apt-card:not([id]):last-of-type')
-  };
-
-  deptos.filter(d => d.activo === false).forEach(d => {
+  // Mapa { slug: activo } — default true si el campo no existe
+  const estado = {};
+  deptos.forEach(d => {
     const slug = aptSlugLocal(d.nombre);
-    const card = slugMap[slug];
-    if (card) card.style.display = 'none';
+    estado[slug] = d.activo !== false;
   });
+
+  // Mostrar / ocultar TODOS los elementos con data-depto
+  document.querySelectorAll('[data-depto]').forEach(el => {
+    const slug = el.getAttribute('data-depto');
+    if (!(slug in estado)) return; // depto desconocido, no tocar
+    if (estado[slug] === false) {
+      el.setAttribute('hidden', '');
+      el.style.display = 'none';
+    } else {
+      el.removeAttribute('hidden');
+      el.style.display = '';
+    }
+  });
+
+  // Recalcular contador del hero ("X Departamentos")
+  const counter = document.querySelector('[data-auto-count-deptos="true"]');
+  if (counter) {
+    const activos = Object.values(estado).filter(Boolean).length;
+    counter.textContent = activos;
+  }
+
+  // Si el botón activo del calendario quedó oculto, seleccionar el primero visible
+  const calBtns = document.querySelectorAll('.av-apt-btn[data-depto]');
+  const activeBtn = document.querySelector('.av-apt-btn.active[data-depto]');
+  const activeSlug = activeBtn?.getAttribute('data-depto');
+  if (activeSlug && estado[activeSlug] === false) {
+    const firstVisible = Array.from(calBtns).find(b => {
+      const s = b.getAttribute('data-depto');
+      return estado[s] !== false;
+    });
+    if (firstVisible && typeof window.avCalChangeApt === 'function') {
+      window.avCalChangeApt(firstVisible.getAttribute('data-depto'));
+    }
+  }
 }
 
 /* ═══════════════════════════════════════════
