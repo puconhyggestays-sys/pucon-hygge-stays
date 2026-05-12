@@ -207,6 +207,10 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .header.scrolled .nav-link:hover { background: var(--cream-dark); color: var(--earth); }
 
 .nav-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
   margin-left: 0.5rem;
   padding: 0.55rem 1.4rem;
   background: var(--white);
@@ -214,8 +218,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   font-size: 0.88rem;
   font-weight: 600;
   border-radius: 50px;
+  line-height: 1;
+  white-space: nowrap;
   transition: all var(--trans);
 }
+.nav-cta i { font-size: 1em; line-height: 1; }
 
 .header.scrolled .nav-cta { background: var(--primary); color: var(--white) !important; }
 .nav-cta:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
